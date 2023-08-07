@@ -20,15 +20,15 @@ public class CameraController : MonoBehaviour
     {
         Instance = this;
         
-        cinemachineTransposer = cinemachineVirtualCamera.GetCinemachineComponent<CinemachineTransposer>();
-        targetFollowOffset = cinemachineTransposer.m_FollowOffset;
+        // cinemachineTransposer = cinemachineVirtualCamera.GetCinemachineComponent<CinemachineTransposer>();
+        // targetFollowOffset = cinemachineTransposer.m_FollowOffset;
     }
 
     private void Update()
     {
-        HandleCameraMovement();
-        HandleCameraRotation();
-        HandleCameraZoom();
+        // HandleCameraMovement();
+        // HandleCameraRotation();
+        // HandleCameraZoom();
     }
 
     private void HandleCameraMovement()

@@ -60,17 +60,16 @@ public class GridSystemVisual : MonoBehaviour
             gridSystemVisualSingleArray[x, z, floor] = gridSystemVisual.GetComponent<GridSystemVisualSingle>();
         }
 
-        UnitActionSystem.Instance.OnSelectedActionChanged += OnSelectedActionChanged;
-        UnitActionSystem.Instance.OnBusyChanged += OnBusyChanged;
+        // UnitActionSystem.Instance.OnSelectedActionChanged += OnSelectedActionChanged;
+        // UnitActionSystem.Instance.OnBusyChanged += OnBusyChanged;
         // LevelGrid.Instance.OnAnyUnitMovedGridPosition += OnAnyUnitMovedGridPosition;
-       
 
-        UpdateGridVisual();
+        // UpdateGridVisual();
     }
 
     private void OnBusyChanged(bool busy)
     {
-        UpdateGridVisual();
+        // UpdateGridVisual();
     }
 
     // private void OnAnyUnitMovedGridPosition()
@@ -78,10 +77,10 @@ public class GridSystemVisual : MonoBehaviour
     //     UpdateGridVisual();
     // }
 
-    private void OnSelectedActionChanged(BaseAction obj)
-    {
-        UpdateGridVisual();
-    }
+    // private void OnSelectedActionChanged(BaseAction obj)
+    // {
+    //     UpdateGridVisual();
+    // }
 
     public void HideAllGridPositions()
     {
@@ -128,54 +127,54 @@ public class GridSystemVisual : MonoBehaviour
         ShowGridPositions(gridPositionList, gridVisualType);
     }
 
-    private void UpdateGridVisual()
-    {
-        HideAllGridPositions();
-
-        Unit selectedUnit = UnitActionSystem.Instance.GetSelectedUnit();
-        BaseAction selectedAction = UnitActionSystem.Instance.GetSelectedAction();
-
-        GridVisualType gridVisualType;
-
-        switch (selectedAction)
-        {
-            default:
-                gridVisualType = GridVisualType.White;
-                break;
-            case SpinAction:
-                gridVisualType = GridVisualType.Blue;
-                break;
-            case GrenadeAction:
-                gridVisualType = GridVisualType.Yellow;
-                break;
-            case InteractAction:
-                gridVisualType = GridVisualType.Blue;
-                break;
-            case ShootAction shootAction:
-                gridVisualType = GridVisualType.Red;
-
-                ShowGridPositionRange(selectedUnit.GetGridPosition(), shootAction.GetMaxShootDistance(),
-                    GridVisualType.RedSoft, GridRangeType.Circle);
-                break;
-            case SwordAction swordAction:
-                gridVisualType = GridVisualType.Red;
-
-                ShowGridPositionRange(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(),
-                    GridVisualType.RedSoft, GridRangeType.Square);
-                break;
-        }
-
-        ShowGridPositions(selectedAction.GetValidGridPositionsForAction(), gridVisualType);
-    }
+    // private void UpdateGridVisual()
+    // {
+    //     HideAllGridPositions();
+    //
+    //     Unit selectedUnit = UnitActionSystem.Instance.GetSelectedUnit();
+    //     BaseAction selectedAction = UnitActionSystem.Instance.GetSelectedAction();
+    //
+    //     GridVisualType gridVisualType;
+    //
+    //     switch (selectedAction)
+    //     {
+    //         default:
+    //             gridVisualType = GridVisualType.White;
+    //             break;
+    //         case SpinAction:
+    //             gridVisualType = GridVisualType.Blue;
+    //             break;
+    //         case GrenadeAction:
+    //             gridVisualType = GridVisualType.Yellow;
+    //             break;
+    //         case InteractAction:
+    //             gridVisualType = GridVisualType.Blue;
+    //             break;
+    //         case ShootAction shootAction:
+    //             gridVisualType = GridVisualType.Red;
+    //
+    //             ShowGridPositionRange(selectedUnit.GetGridPosition(), shootAction.GetMaxShootDistance(),
+    //                 GridVisualType.RedSoft, GridRangeType.Circle);
+    //             break;
+    //         case SwordAction swordAction:
+    //             gridVisualType = GridVisualType.Red;
+    //
+    //             ShowGridPositionRange(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(),
+    //                 GridVisualType.RedSoft, GridRangeType.Square);
+    //             break;
+    //     }
+    //
+    //     ShowGridPositions(selectedAction.GetValidGridPositionsForAction(), gridVisualType);
+    // }
 
     private Material GetGridVisualTypeMaterial(GridVisualType gridVisualType)
     {
         GridVisualTypeMaterial foundGridVisualType =
             gridVisualTypeMaterials.Find(x => x.gridVisualType == gridVisualType);
-
+    
         if (foundGridVisualType.material)
             return foundGridVisualType.material;
-
+    
         Debug.LogError("GridVisualTypeMaterial not found for GridVisualType: " + gridVisualType);
         return null;
     }

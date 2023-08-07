@@ -34,8 +34,12 @@ public class LevelGrid : MonoBehaviour
         
         for (int floor = 0; floor < totalFloors; floor++)
         {
-            gridSystems.Add(new GridSystem<GridObject>(width, height, cellSize, floor, FLOOR_HEIGHT,
-                (gridSystem, gridPosition) => new GridObject(gridSystem, gridPosition)));
+            GridSystem<GridObject> gridSystem  = new(width, height, cellSize, floor, FLOOR_HEIGHT,
+                (gridSystem, gridPosition) => new GridObject(gridSystem, gridPosition));
+            
+            gridSystem.CreateDebugObjects(gridDebugObjectPrefab, gridDebugObjectParent);
+
+            gridSystems.Add(gridSystem);
         }
     }
 
@@ -53,7 +57,7 @@ public class LevelGrid : MonoBehaviour
     
     private void Start()
     {
-        Pathfinding.Instance.Setup(width, height, cellSize, totalFloors);
+        //Pathfinding.Instance.Setup(width, height, cellSize, totalFloors);
     }
 
     private GridSystem<GridObject> GetGridSystem(int floor)
@@ -123,20 +127,20 @@ public class LevelGrid : MonoBehaviour
         return GetGridSystem(gridPos.floor).GetWorldPos(gridPos);
     }
 
-    public IInteractable GetInteractableAtGridPos(GridPosition gridPos)
-    {
-        return GetGridObject(gridPos).GetInteractable();
-    }
-
-    public void SetInteractableAtGridPos(GridPosition gridPos, IInteractable interactable)
-    {
-        GetGridObject(gridPos).SetInteractable(interactable);
-    }
-
-    public void ClearInteractableAtGridPos(GridPosition gridPosition)
-    {
-        GetGridObject(gridPosition).ClearInteractable();
-    }
+    // public IInteractable GetInteractableAtGridPos(GridPosition gridPos)
+    // {
+    //     return GetGridObject(gridPos).GetInteractable();
+    // }
+    //
+    // public void SetInteractableAtGridPos(GridPosition gridPos, IInteractable interactable)
+    // {
+    //     GetGridObject(gridPos).SetInteractable(interactable);
+    // }
+    //
+    // public void ClearInteractableAtGridPos(GridPosition gridPosition)
+    // {
+    //     GetGridObject(gridPosition).ClearInteractable();
+    // }
 
     public int GetWidth() => GetGridSystem(0).GetWidth();
     public int GetHeight() => GetGridSystem(0).GetHeight(); 

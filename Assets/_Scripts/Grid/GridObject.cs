@@ -5,7 +5,7 @@ public class GridObject
     private GridPosition gridPosition;
     private GridSystem<GridObject> gridSystem;
     private readonly List<Unit> unitList;
-    private IInteractable interactable;
+    // private IInteractable interactable;
 
     public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
     {
@@ -49,18 +49,18 @@ public class GridObject
         return HasAnyUnit() ? unitList[0] : null;
     }
 
-    public IInteractable GetInteractable()
-    {
-        return interactable;
-    }
+    // public IInteractable GetInteractable()
+    // {
+    //     return interactable;
+    // }
 
-    public void SetInteractable(IInteractable newInteractable)
-    {
-        interactable = newInteractable;
-    }
+    // public void SetInteractable(IInteractable newInteractable)
+    // {
+    //     interactable = newInteractable;
+    // }
 
-    public void ClearInteractable()
-    {
-        interactable = null;
-    }
+    // public void ClearInteractable()
+    // {
+    //     interactable = null;
+    // }
 }

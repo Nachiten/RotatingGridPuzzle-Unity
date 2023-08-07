@@ -17,7 +17,7 @@ public struct GridPosition : IEquatable<GridPosition>
 
     public override string ToString()
     {
-        return $"{x}, {z}, Floor: {floor}";
+        return $"{x}, {z}\nFloor: {floor}";
     }
 
     public static bool operator ==(GridPosition a, GridPosition b)
