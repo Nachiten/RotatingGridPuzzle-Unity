@@ -19,6 +19,11 @@ public struct GridPosition : IEquatable<GridPosition>
     {
         return $"{x}, {z}\nFloor: {floor}";
     }
+    
+    public string ToOneLineString()
+    {
+        return $"{x}, {z} Floor: {floor}";
+    }
 
     public static bool operator ==(GridPosition a, GridPosition b)
     {

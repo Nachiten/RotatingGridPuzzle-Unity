@@ -23,35 +23,34 @@ public class UnitMovement : MonoBehaviour
 
     public bool TryMoveUnit(GridPosition fromGridPos, GridPosition toGridPos)
     {
-        // Get unit at target grid pos
-        Unit unitAtFromGridPos = LevelGrid.Instance.GetUnitAtGridPos(fromGridPos);
-
-        if (!LevelGrid.Instance.GridPosIsValid(toGridPos))
+        // The unit can move if:
+        // 1. The destination grid pos is valid AND ->
+        // 2. The destination grid pos is empty OR the next units recursivly move
+        if (LevelGrid.Instance.GridPosIsValid(toGridPos) && 
+            (!LevelGrid.Instance.GridPosHasAnyUnit(toGridPos) || 
+             TryMoveUnit(toGridPos, CalculateNextTryingGridPos(fromGridPos, toGridPos))))
         {
-            // Grid pos is not valid, outside of grid
-            return false;
-        }
-
-        if (!LevelGrid.Instance.GridPosHasAnyUnit(toGridPos))
-        {
-            // Unit can move to grid pos
+            // Get the unit at the origin grid pos
+            Unit unitAtFromGridPos = LevelGrid.Instance.GetUnitAtGridPos(fromGridPos);
+            
+            // Debug log from which to which grid pos I moved
+            Debug.Log("Moved from [" + fromGridPos.ToOneLineString() + "] to [" + toGridPos.ToOneLineString() + "]");
+                        
+            // First unit can move only if all the next units could move
             unitAtFromGridPos.MoveUnitToGridPosition(toGridPos);
             return true;
         }
+        
+        return false;
+    }
 
+    private GridPosition CalculateNextTryingGridPos(GridPosition fromGridPos, GridPosition toGridPos)
+    {
+        // Calculate linear signed distance for each axis
         int distanceX = toGridPos.x - fromGridPos.x;
         int distanceZ = toGridPos.z - fromGridPos.z;
 
-        // Check if grid pos + distance is valid and has any unit
-        GridPosition newTryingGridPos = new GridPosition(toGridPos.x + distanceX, toGridPos.z + distanceZ, toGridPos.floor);
-        
-        Unit unitAtToGridPos = LevelGrid.Instance.GetUnitAtGridPos(toGridPos);
-
-        if (!TryMoveUnit(toGridPos, newTryingGridPos)) 
-            return false;
-        
-        // Unit can move to grid pos
-        unitAtToGridPos.MoveUnitToGridPosition(newTryingGridPos);
-        return true;
+        // Get the grid pos behind the unit
+        return new GridPosition(toGridPos.x + distanceX, toGridPos.z + distanceZ, toGridPos.floor);
     }
 }

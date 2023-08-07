@@ -74,8 +74,10 @@ public class Unit : MonoBehaviour
         Vector3 newPosition = transform.position + moveDir;
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPos(newPosition);
 
-        if(UnitMovement.Instance.TryMoveUnit(gridPosition, newGridPosition))
-            MoveUnitToGridPosition(newGridPosition);
+        //if(
+        UnitMovement.Instance.TryMoveUnit(gridPosition, newGridPosition);
+        //    )
+        //MoveUnitToGridPosition(newGridPosition);
     }
 
     // public T GetAction<T>() where T : BaseAction
