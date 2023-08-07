@@ -1,32 +1,13 @@
 using UnityEngine;
 
-public class UnitMovement : MonoBehaviour
+public static class UnitMovement
 {
-    public static UnitMovement Instance { get; private set; }
-
-    private void Awake()
-    {
-        InitializeSingleton();
-    }
-    
-    private void InitializeSingleton()
-    {
-        if (Instance != null)
-        {
-            Debug.LogError("More than one instance of UnitMovement found!");
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-    }
-
-    public bool TryMoveUnit(GridPosition fromGridPos, GridPosition toGridPos)
+    public static bool TryMoveUnit(GridPosition fromGridPos, GridPosition toGridPos)
     {
         // The unit can move if:
         // 1. The destination grid pos is valid AND ->
         // 2. The destination grid pos is empty OR the next units recursivly move
-        if (LevelGrid.Instance.GridPosIsValid(toGridPos) && 
+        if (ValidGridPosToMove(toGridPos) && 
             (!LevelGrid.Instance.GridPosHasAnyUnit(toGridPos) || 
              TryMoveUnit(toGridPos, CalculateNextTryingGridPos(fromGridPos, toGridPos))))
         {
@@ -44,7 +25,12 @@ public class UnitMovement : MonoBehaviour
         return false;
     }
 
-    private GridPosition CalculateNextTryingGridPos(GridPosition fromGridPos, GridPosition toGridPos)
+    private static bool ValidGridPosToMove(GridPosition gridPos)
+    {
+        return LevelGrid.Instance.GridPosIsValid(gridPos) && LevelGrid.Instance.GridPosIsWalkable(gridPos);
+    }
+
+    private static GridPosition CalculateNextTryingGridPos(GridPosition fromGridPos, GridPosition toGridPos)
     {
         // Calculate linear signed distance for each axis
         int distanceX = toGridPos.x - fromGridPos.x;

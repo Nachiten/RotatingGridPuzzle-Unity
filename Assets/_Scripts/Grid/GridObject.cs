@@ -5,6 +5,7 @@ public class GridObject
     private GridPosition gridPosition;
     private GridSystem<GridObject> gridSystem;
     private readonly List<Unit> unitList;
+    private bool isWalkable = true;
     // private IInteractable interactable;
 
     public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
@@ -48,6 +49,9 @@ public class GridObject
     {
         return HasAnyUnit() ? unitList[0] : null;
     }
+    
+    public void SetIsWalkable(bool _isWalkable) => isWalkable = _isWalkable;
+    public bool GetIsWalkable() => isWalkable;
 
     // public IInteractable GetInteractable()
     // {
