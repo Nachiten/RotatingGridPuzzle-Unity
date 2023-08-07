@@ -633,7 +633,6 @@ GameObject:
   - component: {fileID: 7081559183722506976}
   - component: {fileID: 1032635001044666568}
   - component: {fileID: 7081559183722506977}
-  - component: {fileID: 1142464660109947879}
   m_Layer: 7
   m_Name: Unit
   m_TagString: Untagged
@@ -692,23 +691,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 419a51e639c8c934cbffd7bac2b5580c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isEnemy: 0
-  actionPoints: 0
---- !u!114 &1142464660109947879
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7081559183722506979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa71807b91b48b1438d0029202796c5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dymanicFloorPosition: 1
-  ignoredRenderers:
-  - {fileID: 5246000605336129305}
 --- !u!1 &9115034507036913741
 GameObject:
   m_ObjectHideFlags: 0

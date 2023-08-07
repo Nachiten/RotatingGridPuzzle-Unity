@@ -145,4 +145,6 @@ public class LevelGrid : MonoBehaviour
     public int GetWidth() => GetGridSystem(0).GetWidth();
     public int GetHeight() => GetGridSystem(0).GetHeight(); 
     public int GetTotalFloors() => totalFloors;
+    
+    public float GetCellSize() => cellSize;
 }

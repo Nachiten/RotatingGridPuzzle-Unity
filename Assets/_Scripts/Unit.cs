@@ -4,14 +4,16 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
+    [SerializeField] private bool isPlayer = false;
+    
     private int actionPointsMax = 50;
 
-    [SerializeField] private bool isEnemy;
-    [SerializeField] private int actionPoints;
+    // [SerializeField] private bool isEnemy;
+    // [SerializeField] private int actionPoints;
 
-    public static event Action OnAnyActionPointsChanged;
-    public static event Action<Unit> OnAnyUnitSpawned;
-    public static event Action<Unit> OnAnyUnitDead;
+    // public static event Action OnAnyActionPointsChanged;
+    // public static event Action<Unit> OnAnyUnitSpawned;
+    // public static event Action<Unit> OnAnyUnitDead;
 
     private GridPosition gridPosition;
 
@@ -23,7 +25,7 @@ public class Unit : MonoBehaviour
         // healthSystem = GetComponent<HealthSystem>();
         //actions = GetComponents<BaseAction>();
 
-        actionPoints = actionPointsMax;
+        // actionPoints = actionPointsMax;
     }
 
     private void Start()
@@ -34,11 +36,12 @@ public class Unit : MonoBehaviour
         // TurnSystem.Instance.OnTurnChanged += OnTurnChanged;
         // healthSystem.OnDead += OnDead;
 
-        OnAnyUnitSpawned?.Invoke(this);
+        // OnAnyUnitSpawned?.Invoke(this);
     }
 
     private void Update()
     {
+        HandlePlayerMovement();
         HandleGridPosChange();
     }
 
@@ -56,6 +59,25 @@ public class Unit : MonoBehaviour
         LevelGrid.Instance.MoveUnitGridPos(this, oldGridPosition, newGridPosition);
     }
 
+    private void HandlePlayerMovement()
+    {
+        if (!isPlayer)
+            return;
+        
+        // Move according to InputManager GetPlayerMovementVector vector
+        Vector2 inputMoveDir = InputManager.Instance.GetPlayerMovementVector();
+
+        if (inputMoveDir == Vector2.zero)
+            return;
+        
+        Vector3 moveDir = new Vector3(inputMoveDir.x * LevelGrid.Instance.GetCellSize(), 0f, inputMoveDir.y * LevelGrid.Instance.GetCellSize());
+        Vector3 newPosition = transform.position + moveDir;
+        GridPosition newGridPosition = LevelGrid.Instance.GetGridPos(newPosition);
+
+        if(UnitMovement.Instance.TryMoveUnit(gridPosition, newGridPosition))
+            MoveUnitToGridPosition(newGridPosition);
+    }
+
     // public T GetAction<T>() where T : BaseAction
     // {
     //     return actions.OfType<T>().FirstOrDefault();
@@ -64,6 +86,16 @@ public class Unit : MonoBehaviour
     public GridPosition GetGridPosition()
     {
         return gridPosition;
+    }
+
+    // private void MoveUnitToPosition(Vector3 newPosition)
+    // {
+    //     transform.position = newPosition;
+    // }
+    
+    public void MoveUnitToGridPosition(GridPosition _gridPosition)
+    {
+        transform.position = LevelGrid.Instance.GetWorldPos(_gridPosition);
     }
 
     // public BaseAction[] GetActions()
@@ -85,12 +117,12 @@ public class Unit : MonoBehaviour
     //     return actionPoints >= action.GetActionCost();
     // }
 
-    private void SpendActionPoints(int amount)
-    {
-        actionPoints -= amount;
-
-        OnAnyActionPointsChanged?.Invoke();
-    }
+    // private void SpendActionPoints(int amount)
+    // {
+    //     actionPoints -= amount;
+    //
+    //     OnAnyActionPointsChanged?.Invoke();
+    // }
 
     // private void OnTurnChanged()
     // {
@@ -112,15 +144,15 @@ public class Unit : MonoBehaviour
     //     OnAnyUnitDead?.Invoke(this);
     // }
 
-    public int GetActionPoints()
-    {
-        return actionPoints;
-    }
-
-    public bool IsEnemy()
-    {
-        return isEnemy;
-    }
+    // public int GetActionPoints()
+    // {
+    //     return actionPoints;
+    // }
+    //
+    // public bool IsEnemy()
+    // {
+    //     return isEnemy;
+    // }
 
     // public void Damage(int damage)
     // {

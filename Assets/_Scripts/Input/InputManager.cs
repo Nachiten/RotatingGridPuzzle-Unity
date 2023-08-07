@@ -42,10 +42,24 @@ public class InputManager : MonoBehaviour
 #endif
     }
 
-    public Vector2 GetCameraMoveVector()
+    public Vector2 GetPlayerMovementVector()
     {
 #if USE_NEW_INPUT_SYSTEM
-        return playerInputActions.Player.CameraMovement.ReadValue<Vector2>();
+        Vector2 inputMoveDir = Vector2.zero;
+
+        if (Keyboard.current[Key.W].wasPressedThisFrame)
+            inputMoveDir += Vector2.up;
+
+        if (Keyboard.current[Key.S].wasPressedThisFrame)
+            inputMoveDir += Vector2.down;
+
+        if (Keyboard.current[Key.A].wasPressedThisFrame)
+            inputMoveDir += Vector2.left;
+
+        if (Keyboard.current[Key.D].wasPressedThisFrame)
+            inputMoveDir += Vector2.right;
+
+        return inputMoveDir;
 #else
         Vector2 inputMoveDir = Vector2.zero;
 
@@ -65,37 +79,37 @@ public class InputManager : MonoBehaviour
 #endif
     }
 
-    public float GetCameraRotateAmount()
-    {
-#if USE_NEW_INPUT_SYSTEM
-        return playerInputActions.Player.CameraRotate.ReadValue<float>();
-#else
-        float rotateAmount = 0f;
+//     public float GetCameraRotateAmount()
+//     {
+// #if USE_NEW_INPUT_SYSTEM
+//         return playerInputActions.Player.CameraRotate.ReadValue<float>();
+// #else
+//         float rotateAmount = 0f;
+//
+//         if (Input.GetKey(KeyCode.Q))
+//             rotateAmount += 1f;
+//
+//         if (Input.GetKey(KeyCode.E))
+//             rotateAmount -= 1f;
+//
+//         return rotateAmount;
+// #endif
+//     }
 
-        if (Input.GetKey(KeyCode.Q))
-            rotateAmount += 1f;
-
-        if (Input.GetKey(KeyCode.E))
-            rotateAmount -= 1f;
-
-        return rotateAmount;
-#endif
-    }
-
-    public float GetCameraZoomAmount()
-    {
-#if USE_NEW_INPUT_SYSTEM
-        return playerInputActions.Player.CameraZoom.ReadValue<float>();
-#else
-        float zoomAmount = 0f;
-        
-        if (Input.mouseScrollDelta.y > 0)
-            zoomAmount -= 1f;
-
-        if (Input.mouseScrollDelta.y < 0)
-            zoomAmount += 1f;
-
-        return zoomAmount;
-#endif
-    }
+//     public float GetCameraZoomAmount()
+//     {
+// #if USE_NEW_INPUT_SYSTEM
+//         return playerInputActions.Player.CameraZoom.ReadValue<float>();
+// #else
+//         float zoomAmount = 0f;
+//         
+//         if (Input.mouseScrollDelta.y > 0)
+//             zoomAmount -= 1f;
+//
+//         if (Input.mouseScrollDelta.y < 0)
+//             zoomAmount += 1f;
+//
+//         return zoomAmount;
+// #endif
+//     }
 }
