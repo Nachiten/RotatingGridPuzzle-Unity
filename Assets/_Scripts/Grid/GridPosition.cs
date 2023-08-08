@@ -1,6 +1,4 @@
 using System;
-using Unity.XR.OpenVR;
-using UnityEngine;
 
 public struct GridPosition : IEquatable<GridPosition>
 {
@@ -68,10 +66,5 @@ public struct GridPosition : IEquatable<GridPosition>
     public bool FloorIsValid(int totalFloors)
     {
         return floor >= 0 && floor < totalFloors;
-    }
-    
-    public Vector2Int ToVector2Int()
-    {
-        return new Vector2Int(x, z);
     }
 }

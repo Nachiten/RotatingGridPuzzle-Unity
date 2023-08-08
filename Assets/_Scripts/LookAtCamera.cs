@@ -8,7 +8,8 @@ public class LookAtCamera : MonoBehaviour
 
     private void Awake()
     {
-        cameraTransform = Camera.main.transform;
+        if (Camera.main)
+            cameraTransform = Camera.main.transform;
     }
 
     private void LateUpdate()
