@@ -27,6 +27,11 @@ public class Player : GridElement
         Vector3 newPosition = transform.position + moveDir;
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPos(newPosition);
         
-        LevelGrid.Instance.TryMoveGridElement(gridPosition, newGridPosition);
+        // TODO - Se chequean todas las grid positions que tiene el objeto ACTUAL, tambien hay que chequear
+        // todas las que pueda llegar a tener el objeto A MOVER. Error de logica
+        LevelGrid.Instance.TryMoveGridElements(gridPositions, newGridPosition - centerGridPosition);
+        
+        // Pasos del try move grid elements:
+        // 
     }
 }

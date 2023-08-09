@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class LevelGrid : MonoBehaviour
 {
     public const float FLOOR_HEIGHT = 3f;
-    
+
     public event Action OnAnyGridElementMovedGridPosition;
     public static event Action OnAnyGridElementChangedFloor;
 
@@ -19,7 +20,7 @@ public class LevelGrid : MonoBehaviour
     [SerializeField] private LayerMask obstaclesLayerMask;
 
     private List<GridSystem<GridObject>> gridSystems;
-    
+
     public static LevelGrid Instance { get; private set; }
 
     private void Awake()
@@ -40,26 +41,26 @@ public class LevelGrid : MonoBehaviour
 
         Instance = this;
     }
-    
+
     private void InitializeGridSystems()
     {
         gridSystems = new List<GridSystem<GridObject>>();
-        
+
         for (int floor = 0; floor < totalFloors; floor++)
         {
-            GridSystem<GridObject> gridSystem  = new(width, height, cellSize, floor, FLOOR_HEIGHT,
+            GridSystem<GridObject> gridSystem = new(width, height, cellSize, floor, FLOOR_HEIGHT,
                 (gridSystem, gridPosition) => new GridObject(gridSystem, gridPosition));
-            
-            //gridSystem.CreateDebugObjects(gridDebugObjectPrefab, gridDebugObjectParent);
+
+            gridSystem.CreateDebugObjects(gridDebugObjectPrefab, gridDebugObjectParent);
 
             gridSystems.Add(gridSystem);
         }
     }
-    
+
     private void SetWalkableGridPositions()
     {
         // By default, all grid positions are walkable
-        
+
         for (int x = 0; x < width; x++)
         for (int z = 0; z < height; z++)
         for (int floor = 0; floor < totalFloors; floor++)
@@ -67,14 +68,14 @@ public class LevelGrid : MonoBehaviour
             GridPosition gridPosition = new(x, z, floor);
             Vector3 worldPosition = GetWorldPos(gridPosition);
             const float raycastOffsetDistance = 1f;
-            
+
             // Check if there is an obstacle above the grid position
             bool obstaclesRaycast = Physics.Raycast(
                 worldPosition + Vector3.down * raycastOffsetDistance,
                 Vector3.up,
                 raycastOffsetDistance * 2,
                 obstaclesLayerMask);
-            
+
             // If there is an obstacle, set the grid position as unwalkable
             if (obstaclesRaycast)
                 GetGridObjectAtGridPos(gridPosition).SetIsWalkable(false);
@@ -123,7 +124,7 @@ public class LevelGrid : MonoBehaviour
         AddGridElementAtGridPos(toGridPos, gridElement);
 
         OnAnyGridElementMovedGridPosition?.Invoke();
-        
+
         // Only call this event if the GridElement changed floor
         if (fromGridPos.floor != toGridPos.floor)
             OnAnyGridElementChangedFloor?.Invoke();
@@ -138,7 +139,7 @@ public class LevelGrid : MonoBehaviour
     {
         return gridPos.FloorIsValid(totalFloors) && GetGridSystem(gridPos.floor).GridPosIsValid(gridPos);
     }
-    
+
     /// <summary>
     /// Get if the given grid position is walkable
     /// </summary>
@@ -168,7 +169,7 @@ public class LevelGrid : MonoBehaviour
     {
         return GetGridObjectAtGridPos(gridPos).GetGridElement();
     }
-    
+
     /// <summary>
     /// Get the grid object at the given grid position
     /// </summary>
@@ -188,7 +189,7 @@ public class LevelGrid : MonoBehaviour
     {
         return Mathf.RoundToInt(worldPos.y / FLOOR_HEIGHT);
     }
-    
+
     /// <summary>
     /// Get the grid position from the given world position
     /// </summary>
@@ -208,7 +209,7 @@ public class LevelGrid : MonoBehaviour
     {
         return GetGridSystem(gridPos.floor).GetWorldPos(gridPos);
     }
-    
+
     /// <summary>
     /// Try to move the GridElement from the origin grid pos to the destination grid pos.
     /// The GridElement can move if:
@@ -218,26 +219,49 @@ public class LevelGrid : MonoBehaviour
     /// <param name="fromGridPos"> The origin grid pos </param>
     /// <param name="toGridPos"> The destination grid pos </param>
     /// <returns> True if the GridElement could move </returns>
-    public bool TryMoveGridElement(GridPosition fromGridPos, GridPosition toGridPos)
+    private bool TryMoveGridElement(GridPosition fromGridPos, GridPosition toGridPos)
     {
-        if (ValidGridPosToMove(toGridPos) && 
-            (!GridPosHasAnyGridElement(toGridPos) || 
+        GridPosition movementDirection = toGridPos - fromGridPos;
+        
+        if (ValidGridPosToMove(toGridPos) &&
+            (!GridPosHasAnyGridElement(toGridPos) ||
              TryMoveGridElement(toGridPos, CalculateNextTryingGridPos(fromGridPos, toGridPos))))
         {
             // Get the GridElement at the origin grid pos
             GridElement gridElementAtFromGridPos = GetGridElementAtGridPos(fromGridPos);
-            
+
             // Debug log from which to which grid pos I moved
             Debug.Log("Moved from [" + fromGridPos.ToOneLineString() + "] to [" + toGridPos.ToOneLineString() + "]");
-                        
-            // First GridElement can move only if all the next units could move
-            gridElementAtFromGridPos.MoveGridElementToGridPosition(toGridPos);
+            
+            gridElementAtFromGridPos.MoveGridElementInDirection(movementDirection);
+            
             return true;
         }
-        
+
         return false;
     }
 
+    public void TryMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
+    {
+        if (!CanMoveGridElements(gridPositions, direction))
+            return;
+        
+        gridPositions.ForEach(gridPosition => TryMoveGridElement(gridPosition, gridPosition + direction));
+    }
+
+    private bool CanMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
+    {
+        return gridPositions.All(gridPosition => CanMoveGridElement(gridPosition, gridPosition + direction));
+    }
+
+    private bool CanMoveGridElement(GridPosition fromGridPos, GridPosition toGridPos)
+    {
+        return ValidGridPosToMove(toGridPos) && 
+               (!GridPosHasAnyGridElement(toGridPos) || 
+                CanMoveGridElement(toGridPos, CalculateNextTryingGridPos(fromGridPos, toGridPos)));
+    }
+    
+    
     private bool ValidGridPosToMove(GridPosition gridPos)
     {
         return GridPosIsValid(gridPos) && GridPosIsWalkable(gridPos);
