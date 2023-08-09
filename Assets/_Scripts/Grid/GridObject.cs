@@ -1,52 +1,50 @@
 using System.Collections.Generic;
+using System.Linq;
 
 public class GridObject
 {
     private GridPosition gridPosition;
     private GridSystem<GridObject> gridSystem;
-    private readonly List<Unit> unitList;
+    private readonly List<GridElement> gridElements;
     private bool isWalkable = true;
 
     public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
     {
         this.gridSystem = gridSystem;
         this.gridPosition = gridPosition;
-        unitList = new List<Unit>();
+        gridElements = new List<GridElement>();
     }
 
     public override string ToString()
     {
-        string unitString = "";
-
-        foreach (Unit unit in unitList)
-            unitString += unit.name + "\n";
+        string unitString = gridElements.Aggregate("", (current, gridElement) => current + (gridElement.name + "\n"));
 
         return $"{gridPosition.ToString()}\n{unitString}";
     }
 
-    public void AddUnit(Unit unit)
+    public void AddGridElement(GridElement gridElement)
     {
-        unitList.Add(unit);
+        gridElements.Add(gridElement);
     }
 
-    public void RemoveUnit(Unit unit)
+    public void RemoveGridElement(GridElement gridElement)
     {
-        unitList.Remove(unit);
+        gridElements.Remove(gridElement);
     }
 
-    public List<Unit> GetUnitList()
+    public List<GridElement> GetGridElementList()
     {
-        return unitList;
+        return gridElements;
     }
 
-    public bool HasAnyUnit()
+    public bool HasAnyGridElement()
     {
-        return unitList.Count > 0;
+        return gridElements.Count > 0;
     }
 
-    public Unit GetUnit()
+    public GridElement GetGridElement()
     {
-        return HasAnyUnit() ? unitList[0] : null;
+        return HasAnyGridElement() ? gridElements[0] : null;
     }
     
     public void SetIsWalkable(bool _isWalkable) => isWalkable = _isWalkable;

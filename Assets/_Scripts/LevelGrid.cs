@@ -6,8 +6,8 @@ public class LevelGrid : MonoBehaviour
 {
     public const float FLOOR_HEIGHT = 3f;
     
-    public event Action OnAnyUnitMovedGridPosition;
-    public static event Action OnAnyUnitChangedFloor;
+    public event Action OnAnyGridElementMovedGridPosition;
+    public static event Action OnAnyGridElementChangedFloor;
 
     [SerializeField] private Transform gridDebugObjectPrefab;
     [SerializeField] private Transform gridDebugObjectParent;
@@ -82,13 +82,13 @@ public class LevelGrid : MonoBehaviour
     }
 
     /// <summary>
-    /// Add a unit to the grid at the given grid position
+    /// Add a GridElement to the grid at the given grid position
     /// </summary>
-    /// <param name="gridPos"> The grid position to add the unit to </param>
-    /// <param name="unit"> The unit to add to the grid </param>
-    public void AddUnitAtGridPos(GridPosition gridPos, Unit unit)
+    /// <param name="gridPos"> The grid position to add the GridElement to </param>
+    /// <param name="gridElement"> The GridElement to add to the grid </param>
+    public void AddGridElementAtGridPos(GridPosition gridPos, GridElement gridElement)
     {
-        GetGridObjectAtGridPos(gridPos).AddUnit(unit);
+        GetGridObjectAtGridPos(gridPos).AddGridElement(gridElement);
     }
 
     /// <summary>
@@ -96,37 +96,37 @@ public class LevelGrid : MonoBehaviour
     /// </summary>
     /// <param name="gridPos"> The grid position to get the list of units from </param>
     /// <returns> The list of units at the given grid position </returns>
-    public List<Unit> GetUnitListAtGridPos(GridPosition gridPos)
+    public List<GridElement> GetGridElementListAtGridPos(GridPosition gridPos)
     {
-        return GetGridObjectAtGridPos(gridPos).GetUnitList();
+        return GetGridObjectAtGridPos(gridPos).GetGridElementList();
     }
 
     /// <summary>
-    /// Remove a unit from the grid at the given grid position
+    /// Remove a GridElement from the given grid position
     /// </summary>
-    /// <param name="gridPos"> The grid position to remove the unit from </param>
-    /// <param name="unit"> The unit to remove from the grid </param>
-    private void RemoveUnitAtGridPos(GridPosition gridPos, Unit unit)
+    /// <param name="gridPos"> The grid position to remove the GridElement from </param>
+    /// <param name="gridElement"> The GridElement to remove from the grid </param>
+    private void RemoveGridElementAtGridPos(GridPosition gridPos, GridElement gridElement)
     {
-        GetGridObjectAtGridPos(gridPos).RemoveUnit(unit);
+        GetGridObjectAtGridPos(gridPos).RemoveGridElement(gridElement);
     }
 
     /// <summary>
-    /// Move a unit from the origin grid position to the destination grid position
+    /// Move a GridElement from fromGridPos to toGridPos
     /// </summary>
-    /// <param name="unit"> The unit to move </param>
+    /// <param name="gridElement"> The GridElement to move </param>
     /// <param name="fromGridPos"> The origin grid position </param>
     /// <param name="toGridPos"> The destination grid position </param>
-    public void MoveUnitGridPos(Unit unit, GridPosition fromGridPos, GridPosition toGridPos)
+    public void MoveGridElementGridPos(GridElement gridElement, GridPosition fromGridPos, GridPosition toGridPos)
     {
-        RemoveUnitAtGridPos(fromGridPos, unit);
-        AddUnitAtGridPos(toGridPos, unit);
+        RemoveGridElementAtGridPos(fromGridPos, gridElement);
+        AddGridElementAtGridPos(toGridPos, gridElement);
 
-        OnAnyUnitMovedGridPosition?.Invoke();
+        OnAnyGridElementMovedGridPosition?.Invoke();
         
-        // Only call this event if the unit changed floor
+        // Only call this event if the GridElement changed floor
         if (fromGridPos.floor != toGridPos.floor)
-            OnAnyUnitChangedFloor?.Invoke();
+            OnAnyGridElementChangedFloor?.Invoke();
     }
 
     /// <summary>
@@ -150,23 +150,23 @@ public class LevelGrid : MonoBehaviour
     }
 
     /// <summary>
-    /// Get if the given grid position has any unit
+    /// Get if the given grid position has any GridElement
     /// </summary>
     /// <param name="gridPos"> The grid position to check </param>
-    /// <returns> True if the grid position has any unit </returns>
-    private bool GridPosHasAnyUnit(GridPosition gridPos)
+    /// <returns> True if the grid position has any GridElement </returns>
+    private bool GridPosHasAnyGridElement(GridPosition gridPos)
     {
-        return GetGridObjectAtGridPos(gridPos).HasAnyUnit();
+        return GetGridObjectAtGridPos(gridPos).HasAnyGridElement();
     }
 
     /// <summary>
-    /// Get the first unit at the given grid position
+    /// Get the first GridElement at the given grid position
     /// </summary>
-    /// <param name="gridPos"> The grid position to get the unit from </param>
-    /// <returns> The first unit at the given grid position </returns>
-    private Unit GetUnitAtGridPos(GridPosition gridPos)
+    /// <param name="gridPos"> The grid position to get the GridElement from </param>
+    /// <returns> The first GridElement at the given grid position </returns>
+    private GridElement GetGridElementAtGridPos(GridPosition gridPos)
     {
-        return GetGridObjectAtGridPos(gridPos).GetUnit();
+        return GetGridObjectAtGridPos(gridPos).GetGridElement();
     }
     
     /// <summary>
@@ -210,28 +210,28 @@ public class LevelGrid : MonoBehaviour
     }
     
     /// <summary>
-    /// Try to move the unit from the origin grid pos to the destination grid pos.
-    /// The unit can move if:
+    /// Try to move the GridElement from the origin grid pos to the destination grid pos.
+    /// The GridElement can move if:
     /// - The destionation grid pos is valid AND walkable AND ->
     /// - The destination grid pos is empty OR the next units can recursivly move
     /// </summary>
     /// <param name="fromGridPos"> The origin grid pos </param>
     /// <param name="toGridPos"> The destination grid pos </param>
-    /// <returns> True if the unit could move </returns>
-    public bool TryMoveUnit(GridPosition fromGridPos, GridPosition toGridPos)
+    /// <returns> True if the GridElement could move </returns>
+    public bool TryMoveGridElement(GridPosition fromGridPos, GridPosition toGridPos)
     {
         if (ValidGridPosToMove(toGridPos) && 
-            (!GridPosHasAnyUnit(toGridPos) || 
-             TryMoveUnit(toGridPos, CalculateNextTryingGridPos(fromGridPos, toGridPos))))
+            (!GridPosHasAnyGridElement(toGridPos) || 
+             TryMoveGridElement(toGridPos, CalculateNextTryingGridPos(fromGridPos, toGridPos))))
         {
-            // Get the unit at the origin grid pos
-            Unit unitAtFromGridPos = GetUnitAtGridPos(fromGridPos);
+            // Get the GridElement at the origin grid pos
+            GridElement gridElementAtFromGridPos = GetGridElementAtGridPos(fromGridPos);
             
             // Debug log from which to which grid pos I moved
             Debug.Log("Moved from [" + fromGridPos.ToOneLineString() + "] to [" + toGridPos.ToOneLineString() + "]");
                         
-            // First unit can move only if all the next units could move
-            unitAtFromGridPos.MoveUnitToGridPosition(toGridPos);
+            // First GridElement can move only if all the next units could move
+            gridElementAtFromGridPos.MoveGridElementToGridPosition(toGridPos);
             return true;
         }
         
@@ -255,7 +255,7 @@ public class LevelGrid : MonoBehaviour
             Debug.LogError("The distance between the grid positions should be only in one axis!");
         }
 
-        // Get the grid pos behind the unit
+        // Get the grid pos behind the GridElement
         return new GridPosition(toGridPos.x + distanceX, toGridPos.z + distanceZ, toGridPos.floor);
     }
     
