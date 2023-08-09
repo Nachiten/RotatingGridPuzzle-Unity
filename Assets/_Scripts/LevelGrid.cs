@@ -29,6 +29,18 @@ public class LevelGrid : MonoBehaviour
         SetWalkableGridPositions();
     }
 
+    private void InitializeSingleton()
+    {
+        if (Instance != null)
+        {
+            Debug.LogError("More than one instance of LevelGrid found!");
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+    
     private void InitializeGridSystems()
     {
         gridSystems = new List<GridSystem<GridObject>>();
@@ -38,7 +50,7 @@ public class LevelGrid : MonoBehaviour
             GridSystem<GridObject> gridSystem  = new(width, height, cellSize, floor, FLOOR_HEIGHT,
                 (gridSystem, gridPosition) => new GridObject(gridSystem, gridPosition));
             
-            gridSystem.CreateDebugObjects(gridDebugObjectPrefab, gridDebugObjectParent);
+            //gridSystem.CreateDebugObjects(gridDebugObjectPrefab, gridDebugObjectParent);
 
             gridSystems.Add(gridSystem);
         }
@@ -69,38 +81,42 @@ public class LevelGrid : MonoBehaviour
         }
     }
 
-    private void InitializeSingleton()
-    {
-        if (Instance != null)
-        {
-            Debug.LogError("More than one instance of LevelGrid found!");
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-    }
-    
-    private GridSystem<GridObject> GetGridSystem(int floor)
-    {
-        return gridSystems[floor];
-    }
-
+    /// <summary>
+    /// Add a unit to the grid at the given grid position
+    /// </summary>
+    /// <param name="gridPos"> The grid position to add the unit to </param>
+    /// <param name="unit"> The unit to add to the grid </param>
     public void AddUnitAtGridPos(GridPosition gridPos, Unit unit)
     {
         GetGridObjectAtGridPos(gridPos).AddUnit(unit);
     }
 
+    /// <summary>
+    /// Gets the list of units at the given grid position
+    /// </summary>
+    /// <param name="gridPos"> The grid position to get the list of units from </param>
+    /// <returns> The list of units at the given grid position </returns>
     public List<Unit> GetUnitListAtGridPos(GridPosition gridPos)
     {
         return GetGridObjectAtGridPos(gridPos).GetUnitList();
     }
 
-    public void RemoveUnitAtGridPos(GridPosition gridPos, Unit unit)
+    /// <summary>
+    /// Remove a unit from the grid at the given grid position
+    /// </summary>
+    /// <param name="gridPos"> The grid position to remove the unit from </param>
+    /// <param name="unit"> The unit to remove from the grid </param>
+    private void RemoveUnitAtGridPos(GridPosition gridPos, Unit unit)
     {
         GetGridObjectAtGridPos(gridPos).RemoveUnit(unit);
     }
 
+    /// <summary>
+    /// Move a unit from the origin grid position to the destination grid position
+    /// </summary>
+    /// <param name="unit"> The unit to move </param>
+    /// <param name="fromGridPos"> The origin grid position </param>
+    /// <param name="toGridPos"> The destination grid position </param>
     public void MoveUnitGridPos(Unit unit, GridPosition fromGridPos, GridPosition toGridPos)
     {
         RemoveUnitAtGridPos(fromGridPos, unit);
@@ -113,45 +129,137 @@ public class LevelGrid : MonoBehaviour
             OnAnyUnitChangedFloor?.Invoke();
     }
 
-    public bool GridPosIsValid(GridPosition gridPos)
+    /// <summary>
+    /// Get if the given grid position is valid
+    /// </summary>
+    /// <param name="gridPos"> The grid position to check </param>
+    /// <returns> True if the grid position is valid </returns>
+    private bool GridPosIsValid(GridPosition gridPos)
     {
         return gridPos.FloorIsValid(totalFloors) && GetGridSystem(gridPos.floor).GridPosIsValid(gridPos);
     }
     
-    public bool GridPosIsWalkable(GridPosition gridPos)
+    /// <summary>
+    /// Get if the given grid position is walkable
+    /// </summary>
+    /// <param name="gridPos"> The grid position to check </param>
+    /// <returns> True if the grid position is walkable </returns>
+    private bool GridPosIsWalkable(GridPosition gridPos)
     {
         return GetGridObjectAtGridPos(gridPos).GetIsWalkable();
     }
 
-    public bool GridPosHasAnyUnit(GridPosition gridPos)
+    /// <summary>
+    /// Get if the given grid position has any unit
+    /// </summary>
+    /// <param name="gridPos"> The grid position to check </param>
+    /// <returns> True if the grid position has any unit </returns>
+    private bool GridPosHasAnyUnit(GridPosition gridPos)
     {
         return GetGridObjectAtGridPos(gridPos).HasAnyUnit();
     }
 
-    public Unit GetUnitAtGridPos(GridPosition gridPos)
+    /// <summary>
+    /// Get the first unit at the given grid position
+    /// </summary>
+    /// <param name="gridPos"> The grid position to get the unit from </param>
+    /// <returns> The first unit at the given grid position </returns>
+    private Unit GetUnitAtGridPos(GridPosition gridPos)
     {
         return GetGridObjectAtGridPos(gridPos).GetUnit();
     }
-
+    
+    /// <summary>
+    /// Get the grid object at the given grid position
+    /// </summary>
+    /// <param name="gridPos"> The grid position to get the grid object from </param>
+    /// <returns> The grid object at the given grid position </returns>
     private GridObject GetGridObjectAtGridPos(GridPosition gridPos)
     {
         return GetGridSystem(gridPos.floor).GetGridObject(gridPos);
     }
 
-    public int GetFloorFromWorldPos(Vector3 worldPos)
+    /// <summary>
+    /// Get the floor from the given world position
+    /// </summary>
+    /// <param name="worldPos"> The world position to get the floor from </param>
+    /// <returns> The floor from the given world position </returns>
+    private int GetFloorFromWorldPos(Vector3 worldPos)
     {
         return Mathf.RoundToInt(worldPos.y / FLOOR_HEIGHT);
     }
     
+    /// <summary>
+    /// Get the grid position from the given world position
+    /// </summary>
+    /// <param name="worldPos"> The world position to get the grid position from </param>
+    /// <returns> The grid position from the given world position </returns>
     public GridPosition GetGridPos(Vector3 worldPos)
     {
         return GetGridSystem(GetFloorFromWorldPos(worldPos)).GetGridPos(worldPos);
     }
 
+    /// <summary>
+    /// Get the world position from the given grid position
+    /// </summary>
+    /// <param name="gridPos"> The grid position to get the world position from </param>
+    /// <returns> The world position from the given grid position </returns>
     public Vector3 GetWorldPos(GridPosition gridPos)
     {
         return GetGridSystem(gridPos.floor).GetWorldPos(gridPos);
     }
+    
+    /// <summary>
+    /// Try to move the unit from the origin grid pos to the destination grid pos.
+    /// The unit can move if:
+    /// - The destionation grid pos is valid AND walkable AND ->
+    /// - The destination grid pos is empty OR the next units can recursivly move
+    /// </summary>
+    /// <param name="fromGridPos"> The origin grid pos </param>
+    /// <param name="toGridPos"> The destination grid pos </param>
+    /// <returns> True if the unit could move </returns>
+    public bool TryMoveUnit(GridPosition fromGridPos, GridPosition toGridPos)
+    {
+        if (ValidGridPosToMove(toGridPos) && 
+            (!GridPosHasAnyUnit(toGridPos) || 
+             TryMoveUnit(toGridPos, CalculateNextTryingGridPos(fromGridPos, toGridPos))))
+        {
+            // Get the unit at the origin grid pos
+            Unit unitAtFromGridPos = GetUnitAtGridPos(fromGridPos);
+            
+            // Debug log from which to which grid pos I moved
+            Debug.Log("Moved from [" + fromGridPos.ToOneLineString() + "] to [" + toGridPos.ToOneLineString() + "]");
+                        
+            // First unit can move only if all the next units could move
+            unitAtFromGridPos.MoveUnitToGridPosition(toGridPos);
+            return true;
+        }
+        
+        return false;
+    }
+
+    private bool ValidGridPosToMove(GridPosition gridPos)
+    {
+        return GridPosIsValid(gridPos) && GridPosIsWalkable(gridPos);
+    }
+
+    private GridPosition CalculateNextTryingGridPos(GridPosition fromGridPos, GridPosition toGridPos)
+    {
+        // Calculate linear signed distance for each axis
+        int distanceX = toGridPos.x - fromGridPos.x;
+        int distanceZ = toGridPos.z - fromGridPos.z;
+        
+        // Both distances should not be different from zero
+        if (distanceX != 0 && distanceZ != 0)
+        {
+            Debug.LogError("The distance between the grid positions should be only in one axis!");
+        }
+
+        // Get the grid pos behind the unit
+        return new GridPosition(toGridPos.x + distanceX, toGridPos.z + distanceZ, toGridPos.floor);
+    }
+    
+    private GridSystem<GridObject> GetGridSystem(int floor) => gridSystems[floor];
     
     public int GetWidth() => GetGridSystem(0).GetWidth();
     public int GetHeight() => GetGridSystem(0).GetHeight(); 

@@ -49,14 +49,11 @@ public class InputManager : MonoBehaviour
 
         if (Keyboard.current[Key.W].wasPressedThisFrame)
             inputMoveDir += Vector2.up;
-
-        if (Keyboard.current[Key.S].wasPressedThisFrame)
-            inputMoveDir += Vector2.down;
-
-        if (Keyboard.current[Key.A].wasPressedThisFrame)
+        else if (Keyboard.current[Key.A].wasPressedThisFrame)
             inputMoveDir += Vector2.left;
-
-        if (Keyboard.current[Key.D].wasPressedThisFrame)
+        else if (Keyboard.current[Key.S].wasPressedThisFrame)
+            inputMoveDir += Vector2.down;
+        else if (Keyboard.current[Key.D].wasPressedThisFrame)
             inputMoveDir += Vector2.right;
 
         return inputMoveDir;
