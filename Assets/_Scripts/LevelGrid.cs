@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using UnityEngine;
 
 public class LevelGrid : MonoBehaviour
@@ -209,82 +210,102 @@ public class LevelGrid : MonoBehaviour
     {
         return GetGridSystem(gridPos.floor).GetWorldPos(gridPos);
     }
-
+    
     /// <summary>
-    /// Try to move the GridElement from the origin grid pos to the destination grid pos.
-    /// The GridElement can move if:
-    /// - The destionation grid pos is valid AND walkable AND ->
-    /// - The destination grid pos is empty OR the next units can recursivly move
+    /// Move a GridElement from the given grid position in the given direction
     /// </summary>
-    /// <param name="fromGridPos"> The origin grid pos </param>
-    /// <param name="toGridPos"> The destination grid pos </param>
-    /// <returns> True if the GridElement could move </returns>
-    private bool TryMoveGridElement(GridPosition fromGridPos, GridPosition toGridPos)
+    /// <param name="fromGridPos"> The origin grid position </param>
+    /// <param name="direction"> The direction to move the GridElement in </param>
+    private void MoveGridElement(GridPosition fromGridPos, GridPosition direction)
     {
-        GridPosition movementDirection = toGridPos - fromGridPos;
-        
-        if (ValidGridPosToMove(toGridPos) &&
-            (!GridPosHasAnyGridElement(toGridPos) ||
-             TryMoveGridElement(toGridPos, CalculateNextTryingGridPos(fromGridPos, toGridPos))))
+        GridElement gridElementAtGridPos = GetGridElementAtGridPos(fromGridPos);
+
+        // Cycle through all grid positions in the given direction
+        gridElementAtGridPos.GetGridPositions().ForEach(_fromGridPos =>
         {
+            GridPosition _toGridPos = _fromGridPos + direction;
+
+            if (!ValidGridPosToMove(_toGridPos))
+            {
+                Debug.LogError("Should not happen: Invalid grid position to move to");
+                return;
+            }
+            
+            if (GridPosHasAnyGridElement(_toGridPos))
+                MoveGridElement(_toGridPos, direction);
+
             // Get the GridElement at the origin grid pos
-            GridElement gridElementAtFromGridPos = GetGridElementAtGridPos(fromGridPos);
+            GridElement gridElementAtFromGridPos = GetGridElementAtGridPos(_fromGridPos);
 
+            // The grid element that started this call is moved after the loop finishes
+            if (gridElementAtFromGridPos == gridElementAtGridPos) 
+                return;
+            
             // Debug log from which to which grid pos I moved
-            Debug.Log("Moved from [" + fromGridPos.ToOneLineString() + "] to [" + toGridPos.ToOneLineString() + "]");
-            
-            gridElementAtFromGridPos.MoveGridElementInDirection(movementDirection);
-            
-            return true;
-        }
+            Debug.Log($"Moved {gridElementAtFromGridPos.name} " +
+                      $"from [{_fromGridPos.ToString()}] " +
+                      $"to [{_toGridPos.ToString()}]");
+                
+            gridElementAtFromGridPos.MoveGridElementInDirection(direction);
+        });
 
-        return false;
+        // The grid element that started this call is moved now
+        gridElementAtGridPos.MoveGridElementInDirection(direction);
     }
 
+    /// <summary>
+    /// Try to move the GridElements at the given grid positions in the given direction
+    /// </summary>
+    /// <param name="gridPositions"> The grid positions to move the GridElements from </param>
+    /// <param name="direction"> The direction to move the GridElements in </param>
     public void TryMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
     {
         if (!CanMoveGridElements(gridPositions, direction))
+        {
+            Debug.Log("Can't move GridElements");
             return;
-        
-        gridPositions.ForEach(gridPosition => TryMoveGridElement(gridPosition, gridPosition + direction));
-    }
+        }
 
+        gridPositions.ForEach(gridPosition =>
+        {
+            GridElement gridElementAtGridPos = GetGridElementAtGridPos(gridPosition);
+
+            gridElementAtGridPos.GetGridPositions()
+                .ForEach(_gridPosition =>
+                {
+                    MoveGridElement(_gridPosition, direction);
+                });
+        });
+    }
+    
+    /// <summary>
+    /// Get if ALL the GridElements at the given grid positions can be moved in the given direction
+    /// </summary>
+    /// <param name="gridPositions"> The grid positions to check </param>
+    /// <param name="direction"> The direction to check </param>
+    /// <returns> True if ALL the GridElements at the grid positions can be moved in the direction </returns>
     private bool CanMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
     {
-        return gridPositions.All(gridPosition => CanMoveGridElement(gridPosition, gridPosition + direction));
+        return gridPositions
+                .All(gridPosition => GetGridElementAtGridPos(gridPosition).GetGridPositions()
+                    .All(_gridPosition => CanMoveGridElement(_gridPosition, direction)));
     }
 
-    private bool CanMoveGridElement(GridPosition fromGridPos, GridPosition toGridPos)
+    private bool CanMoveGridElement(GridPosition fromGridPos, GridPosition direction)
     {
+        GridPosition toGridPos = fromGridPos + direction;
+        
         return ValidGridPosToMove(toGridPos) && 
                (!GridPosHasAnyGridElement(toGridPos) || 
-                CanMoveGridElement(toGridPos, CalculateNextTryingGridPos(fromGridPos, toGridPos)));
+                CanMoveGridElement(toGridPos, direction));
     }
-    
-    
+
     private bool ValidGridPosToMove(GridPosition gridPos)
     {
         return GridPosIsValid(gridPos) && GridPosIsWalkable(gridPos);
     }
 
-    private GridPosition CalculateNextTryingGridPos(GridPosition fromGridPos, GridPosition toGridPos)
-    {
-        // Calculate linear signed distance for each axis
-        int distanceX = toGridPos.x - fromGridPos.x;
-        int distanceZ = toGridPos.z - fromGridPos.z;
-        
-        // Both distances should not be different from zero
-        if (distanceX != 0 && distanceZ != 0)
-        {
-            Debug.LogError("The distance between the grid positions should be only in one axis!");
-        }
-
-        // Get the grid pos behind the GridElement
-        return new GridPosition(toGridPos.x + distanceX, toGridPos.z + distanceZ, toGridPos.floor);
-    }
-    
     private GridSystem<GridObject> GetGridSystem(int floor) => gridSystems[floor];
-    
     public int GetWidth() => GetGridSystem(0).GetWidth();
     public int GetHeight() => GetGridSystem(0).GetHeight(); 
     public int GetTotalFloors() => totalFloors;

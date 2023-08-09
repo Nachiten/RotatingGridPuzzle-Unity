@@ -69,7 +69,12 @@ public class GridElement : MonoBehaviour
     //public bool IsCenterGridPosition(GridPosition gridPosition) => gridPosition == centerGridPosition;
     
     public List<GridPosition> GetGridPositions() { return gridPositions; }
-    
+
+    public List<GridPosition> GetGridPositionsForDirection(GridPosition direction)
+    {
+        return gridPositions;
+    }
+
     // public GridPosition GetGridPosition() => gridPosition;
     // public Vector3 GetWorldPosition() => transform.position;
 }

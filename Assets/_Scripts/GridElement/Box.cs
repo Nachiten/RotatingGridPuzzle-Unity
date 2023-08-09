@@ -13,6 +13,13 @@ public class Box : GridElement
         if (!isTestingBox)
             return;
         
+        /*
+         * TODO - This data is hardcoded:
+         * 1 - The extra grid positions should be added automatically
+         * 2 - GetGridPositionsForDirection should be updated so it calculates what the relevant grid positions are,
+         * that push the correct places depending on the direction of movment
+         */
+        
         // // Get X and Z scale
         // Vector3 scale = transform.localScale;
         //

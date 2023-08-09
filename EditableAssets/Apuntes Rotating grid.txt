@@ -1,0 +1,9 @@
+Si el bloque solo ocupa 1 GridPosition 
+-> Empuja todo lo q esté adelante
+-> Luego, Se mueve a si mismo
+
+Si el bloque ocupa >1 GridPosition
+-> Empuja todo lo que esté adelante en cada celda "borde"
+	-> Si la celda no tiene nada adelante, no hace nada
+	-> Si tiene algo adelante, empuja en cadena
+-> Luego, se mueve a si mismo
