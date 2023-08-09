@@ -7,13 +7,13 @@ public class GridDebugObject : MonoBehaviour
 
     private object gridObject;
 
-    protected virtual void Update()
+    private void Update()
     {
         gridText.text = gridObject.ToString();
     }
 
-    public virtual void SetGridObject(object gridObject)
+    public void SetGridObject(object _gridObject)
     {
-        this.gridObject = gridObject;
+        gridObject = _gridObject;
     }
 }
