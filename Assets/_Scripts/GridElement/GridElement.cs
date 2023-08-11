@@ -20,7 +20,6 @@ public class GridElement : MonoBehaviour
     {
         centerGridPosition = LevelGrid.Instance.GetGridPos(transform.position);
         LevelGrid.Instance.AddGridElementAtGridPos(centerGridPosition, this);
-        
         gridPositions.Add(centerGridPosition);
     }
 
@@ -65,13 +64,15 @@ public class GridElement : MonoBehaviour
             return gridPosition + direction;
         }).ToList();
     }
-    
-    //public bool IsCenterGridPosition(GridPosition gridPosition) => gridPosition == centerGridPosition;
-    
-    public List<GridPosition> GetGridPositions() { return gridPositions; }
 
-    public List<GridPosition> GetGridPositionsForDirection(GridPosition direction)
+    //public List<GridPosition> GetGridPositions() { return gridPositions; }
+
+    public virtual List<GridPosition> GetGridPositionsForDirection(GridPosition direction)
     {
+        // TODO - Calculate the relevant grid positions for the direction
+        
+        // If direction is up, take 
+        
         return gridPositions;
     }
 

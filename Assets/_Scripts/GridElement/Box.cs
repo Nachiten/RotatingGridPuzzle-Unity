@@ -1,40 +1,66 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Box : GridElement
 {
-    // No special logic needed (yet)
-
-    [SerializeField] bool isTestingBox = false;
+    private int xOffset;
+    private int zOffset;
     
     protected override void Start()
     {
-        base.Start();
+        centerGridPosition = LevelGrid.Instance.GetGridPos(transform.position);
+        
+        Vector3 scale = transform.localScale;
+        int xScale = Mathf.RoundToInt(scale.x);
+        int zScale = Mathf.RoundToInt(scale.z);
+       
+        xOffset = xScale / 2;
+        zOffset = zScale / 2;
+        
+        for (int xValue = -xOffset; xValue <= xOffset; xValue++)
+        {
+            for (int zValue = -zOffset; zValue <= zOffset; zValue++)
+            {
+                GridPosition gridPosition = centerGridPosition + new GridPosition(xValue, zValue, 0);
+                gridPositions.Add(gridPosition);
+                LevelGrid.Instance.AddGridElementAtGridPos(gridPosition, this);
+            }
+        }
+        
+        //LevelGrid.Instance.PrintGridPositionsList(gridPositions);
+    }
 
-        if (!isTestingBox)
-            return;
+    public override List<GridPosition> GetGridPositionsForDirection(GridPosition direction)
+    {
+        int _xOffet = direction.x switch
+        {
+            > 0 => xOffset,
+            < 0 => -xOffset,
+            _ => 0
+        };
+
+        int _zOffet = direction.z switch
+        {
+            > 0 => zOffset,
+            < 0 => -zOffset,
+            _ => 0
+        };
+
+        // La coord x de la grid pos tiene q ser = a la coord x del centro de la box + el offset
+        // Idem la coord z
+        List<GridPosition> _gridPositions = gridPositions.Where(gridPosition =>
+        {
+            // Its is not moving in that direction, or it is moving in that and the grid pos obeys the condition
+            bool hasXOffset = _xOffet == 0 || gridPosition.x == centerGridPosition.x + _xOffet;
+            bool hasZOffset = _zOffet == 0 || gridPosition.z == centerGridPosition.z + _zOffet;
+            
+            return hasXOffset && hasZOffset;
+        }).ToList();
+
+        LevelGrid.Instance.PrintGridPositionsList(_gridPositions, "Grid positions for direction");
         
-        /*
-         * TODO - This data is hardcoded:
-         * 1 - The extra grid positions should be added automatically
-         * 2 - GetGridPositionsForDirection should be updated so it calculates what the relevant grid positions are,
-         * that push the correct places depending on the direction of movment
-         */
-        
-        // // Get X and Z scale
-        // Vector3 scale = transform.localScale;
-        //
-        // // If scale in X is 3, the box is 3 in this axis, get the GridPosition in x-1 and x+1
-        // int xScale = Mathf.RoundToInt(scale.x);
-        Vector3 positionZ_Plus_1 = transform.position + new Vector3(0f, 0f, LevelGrid.Instance.GetCellSize());
-        Vector3 positionZ_Minus_1 = transform.position - new Vector3(0f, 0f, LevelGrid.Instance.GetCellSize());
-        
-        GridPosition GridPositionZ_Plus_1 = LevelGrid.Instance.GetGridPos(positionZ_Plus_1);
-        GridPosition GridPositionZ_Minus_1 = LevelGrid.Instance.GetGridPos(positionZ_Minus_1);
-        
-        gridPositions.Add(GridPositionZ_Plus_1);
-        LevelGrid.Instance.AddGridElementAtGridPos(GridPositionZ_Plus_1, this);
-        
-        gridPositions.Add(GridPositionZ_Minus_1);
-        LevelGrid.Instance.AddGridElementAtGridPos(GridPositionZ_Minus_1, this);
+        return _gridPositions;
     }
 }

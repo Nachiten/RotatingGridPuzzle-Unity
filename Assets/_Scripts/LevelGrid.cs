@@ -211,17 +211,17 @@ public class LevelGrid : MonoBehaviour
         return GetGridSystem(gridPos.floor).GetWorldPos(gridPos);
     }
     
-    // /// <summary>
-    // /// Move a GridElement from the given grid position in the given direction
-    // /// </summary>
-    // /// <param name="fromGridPos"> The origin grid position </param>
-    // /// <param name="direction"> The direction to move the GridElement in </param>
+    /// <summary>
+    /// Move a GridElement from the given grid position in the given direction
+    /// </summary>
+    /// <param name="fromGridPos"> The origin grid position </param>
+    /// <param name="direction"> The direction to move the GridElement in </param>
     private void MoveGridElement(GridPosition fromGridPos, GridPosition direction)
     {
         GridElement gridElementAtGridPos = GetGridElementAtGridPos(fromGridPos);
     
         // Cycle through all grid positions in the given direction
-        gridElementAtGridPos.GetGridPositions().ForEach(_fromGridPos =>
+        gridElementAtGridPos.GetGridPositionsForDirection(direction).ForEach(_fromGridPos =>
         {
             GridPosition _toGridPos = _fromGridPos + direction;
     
@@ -291,14 +291,14 @@ public class LevelGrid : MonoBehaviour
                 return true;
             }
 
-            return CanMoveGridElements(GetGridElementAtGridPos(gridPosition + direction)
-                .GetGridPositions(), direction);
+            return CanMoveGridElements(
+                GetGridElementAtGridPos(gridPosition + direction).GetGridPositionsForDirection(direction), direction);
         });
     }
 
-    private void PrintList(List<GridPosition> gridPositions)
+    public void PrintGridPositionsList(List<GridPosition> gridPositions, string listName = "Grid Positions")
     {
-        Debug.Log("----- Grid Positions ------");
+        Debug.Log($"----- {listName} ------");
         
         gridPositions.ForEach(gridPosition =>
         {

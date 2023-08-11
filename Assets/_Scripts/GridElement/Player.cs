@@ -28,9 +28,6 @@ public class Player : GridElement
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPos(newPosition);
         GridPosition direction = newGridPosition - centerGridPosition;
         
-        // TDOO - Calculate grid positions for direction correctly
         LevelGrid.Instance.TryMoveGridElements(GetGridPositionsForDirection(direction), direction);
-        
-        //LevelGrid.Instance.MakeElementsToMoveList(GetGridPositionsForDirection(direction), direction);
     }
 }
