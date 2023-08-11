@@ -58,7 +58,7 @@ public class Box : GridElement
             return hasXOffset && hasZOffset;
         }).ToList();
 
-        LevelGrid.Instance.PrintGridPositionsList(_gridPositions, "Grid positions for direction");
+        //LevelGrid.Instance.PrintGridPositionsList(_gridPositions, "Grid positions for direction");
         
         return _gridPositions;
     }

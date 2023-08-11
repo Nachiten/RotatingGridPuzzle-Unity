@@ -219,9 +219,12 @@ public class LevelGrid : MonoBehaviour
     private void MoveGridElement(GridPosition fromGridPos, GridPosition direction)
     {
         GridElement gridElementAtGridPos = GetGridElementAtGridPos(fromGridPos);
-    
+        List<GridPosition> gridPositionsToMoveTo = gridElementAtGridPos.GetGridPositionsForDirection(direction);
+        
+        PrintGridPositionsList(gridPositionsToMoveTo, "Grid positions to move to");
+        
         // Cycle through all grid positions in the given direction
-        gridElementAtGridPos.GetGridPositionsForDirection(direction).ForEach(_fromGridPos =>
+        gridPositionsToMoveTo.ForEach(_fromGridPos =>
         {
             GridPosition _toGridPos = _fromGridPos + direction;
     
