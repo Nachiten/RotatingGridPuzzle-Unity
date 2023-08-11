@@ -1,0 +1,15 @@
+Algoritmo:
+- Bucle en todos los GridPosition que el GridElement ocupa
+	- Para cada grid element:
+	- Si NO es valida la celda siguiente => no puede moverse (corta bucle)
+	- Si ES valida y ES vacia la celda siguiente => puede moverse (corta bucle)
+	- Si ES valida y NO es vacia => Repetir bucle grande para la GridPosition de la selda SIGUIENTE segun direccion a la GridPosition que se está analizando
+
+
+Ejemplo:
+1) Analizo todos los GridPosition que el player ocupa (3,5)
+2) La siguiente celda (4,5) ES valida y NO es vacia => Repito bucle para siguiente grid position (4,5)
+3) Obtengo todos los grid position que ocupa (4,5): (4,7) (4,6) (4,5)
+4) Analizo (4,7): ES valida y vacia celda siguiente => PUEDE moverse
+5) Analizo (4,6): ES valida y NO es vacia => Repito bucle para siguiente grid position (5,6)
+6) Analizo (4,5): ES valida y NO es vacia => Repito bucle para siguiente grid position (5,5)
