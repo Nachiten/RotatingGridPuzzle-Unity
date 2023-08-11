@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,7 +8,7 @@ public class GridElement : MonoBehaviour
     protected GridPosition centerGridPosition;
     protected List<GridPosition> gridPositions;
     protected Vector3 targetPosition;
-    protected bool isMoving = false;
+    protected bool isMoving;
 
     private void Awake()
     {
