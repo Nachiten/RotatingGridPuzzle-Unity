@@ -64,18 +64,12 @@ public class GridElement : MonoBehaviour
             return gridPosition + direction;
         }).ToList();
     }
-
-    //public List<GridPosition> GetGridPositions() { return gridPositions; }
-
+    
     public virtual List<GridPosition> GetGridPositionsForDirection(GridPosition direction)
     {
-        // TODO - Calculate the relevant grid positions for the direction
-        
-        // If direction is up, take 
-        
         return gridPositions;
     }
 
-    // public GridPosition GetGridPosition() => gridPosition;
+    // public GridPosition GetCenterGridPosition() => centerGridPosition;
     // public Vector3 GetWorldPosition() => transform.position;
 }
