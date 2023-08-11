@@ -46,8 +46,31 @@ public class GridElement : MonoBehaviour
 
     private void MoveGridPositionsInDirection(GridPosition direction)
     {
+        // Order the gridPositions depending on direction
+        // If direction.x > 0, then order by x DESCENDING (-gridPosition.x)
+        // If direction.x < 0, then order by x ASCENDING
+        // If direction.z > 0, then order by z DESCENDING
+        // If direction.z < 0, then order by z ASCENDING
+
+        gridPositions = gridPositions.OrderBy(gridPosition =>
+        {
+            return direction.x switch
+            {
+                > 0 => -gridPosition.x,
+                < 0 => +gridPosition.x,
+                _ => direction.z switch
+                {
+                    > 0 => -gridPosition.z,
+                    < 0 => +gridPosition.z,
+                    _ => 0
+                }
+            };
+        }).ToList();
+        
         gridPositions = gridPositions.Select(gridPosition =>
         {
+            Debug.Log($"Moving grid position {gridPosition}");
+            
             GridPosition toGridPos = gridPosition + direction;
             
             LevelGrid.Instance.MoveGridElementGridPos(this, gridPosition, gridPosition + direction);

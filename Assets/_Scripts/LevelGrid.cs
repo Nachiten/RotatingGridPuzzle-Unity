@@ -261,12 +261,12 @@ public class LevelGrid : MonoBehaviour
     /// </summary>
     /// <param name="gridPositions"> The grid positions to move the GridElements from </param>
     /// <param name="direction"> The direction to move the GridElements in </param>
-    public void TryMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
+    public bool TryMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
     {
         if (!CanMoveGridElements(gridPositions, direction))
         {
             Debug.Log("Can't move GridElements");
-            return;
+            return false;
         }
         
         Debug.Log("Can move GridElements");
@@ -275,6 +275,8 @@ public class LevelGrid : MonoBehaviour
         {
             MoveGridElement(gridPosition, direction);
         });
+
+        return true;
     }
 
     private bool CanMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
@@ -286,7 +288,7 @@ public class LevelGrid : MonoBehaviour
             if (!ValidGridPosToMove(toGridPos))
             {
                 Debug.Log("Can't move GridElements");
-                PrintGridPositionsList(gridPositions, "Grid positions to move");
+                //PrintGridPositionsList(gridPositions, "Grid positions to move");
                 return false;
             }
 

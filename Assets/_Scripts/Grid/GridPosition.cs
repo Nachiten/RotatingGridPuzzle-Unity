@@ -15,7 +15,7 @@ public struct GridPosition : IEquatable<GridPosition>
 
     public override string ToString()
     {
-        return $"{x}, {z}";
+        return $"({x}, {z})";
     }
 
     public static bool operator ==(GridPosition a, GridPosition b)
@@ -53,10 +53,10 @@ public struct GridPosition : IEquatable<GridPosition>
         return new GridPosition(a.x - b.x, a.z - b.z, a.floor - b.floor);
     }
 
-    public int Distance(GridPosition other)
-    {
-        return Math.Abs(x - other.x) + Math.Abs(z - other.z) + Math.Abs(floor - other.floor);
-    }
+    // public int Distance(GridPosition other)
+    // {
+    //     return Math.Abs(x - other.x) + Math.Abs(z - other.z) + Math.Abs(floor - other.floor);
+    // }
     
     public bool FloorIsValid(int totalFloors)
     {

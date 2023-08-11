@@ -18,12 +18,12 @@ public class Player : GridElement
         if (inputMoveDir == Vector2.zero)
             return;
 
-        // If the player is moving, teletransport it to the previous target position
+        // If the player is moving, transport it to the previous target position
         if (isMoving)
             transform.position = targetPosition;
 
         // Calculate new position
-        Vector3 moveDir = new Vector3(inputMoveDir.x * LevelGrid.Instance.GetCellSize(), 0f, inputMoveDir.y * LevelGrid.Instance.GetCellSize());
+        Vector3 moveDir = new(inputMoveDir.x * LevelGrid.Instance.GetCellSize(), 0f, inputMoveDir.y * LevelGrid.Instance.GetCellSize());
         Vector3 newPosition = transform.position + moveDir;
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPos(newPosition);
         GridPosition direction = newGridPosition - centerGridPosition;
