@@ -211,20 +211,20 @@ public class LevelGrid : MonoBehaviour
         return GetGridSystem(gridPos.floor).GetWorldPos(gridPos);
     }
     
-    /// <summary>
-    /// Move a GridElement from the given grid position in the given direction
-    /// </summary>
-    /// <param name="fromGridPos"> The origin grid position </param>
-    /// <param name="direction"> The direction to move the GridElement in </param>
+    // /// <summary>
+    // /// Move a GridElement from the given grid position in the given direction
+    // /// </summary>
+    // /// <param name="fromGridPos"> The origin grid position </param>
+    // /// <param name="direction"> The direction to move the GridElement in </param>
     private void MoveGridElement(GridPosition fromGridPos, GridPosition direction)
     {
         GridElement gridElementAtGridPos = GetGridElementAtGridPos(fromGridPos);
-
+    
         // Cycle through all grid positions in the given direction
         gridElementAtGridPos.GetGridPositions().ForEach(_fromGridPos =>
         {
             GridPosition _toGridPos = _fromGridPos + direction;
-
+    
             if (!ValidGridPosToMove(_toGridPos))
             {
                 Debug.LogError("Should not happen: Invalid grid position to move to");
@@ -233,10 +233,10 @@ public class LevelGrid : MonoBehaviour
             
             if (GridPosHasAnyGridElement(_toGridPos))
                 MoveGridElement(_toGridPos, direction);
-
+    
             // Get the GridElement at the origin grid pos
             GridElement gridElementAtFromGridPos = GetGridElementAtGridPos(_fromGridPos);
-
+    
             // The grid element that started this call is moved after the loop finishes
             if (gridElementAtFromGridPos == gridElementAtGridPos) 
                 return;
@@ -248,7 +248,7 @@ public class LevelGrid : MonoBehaviour
                 
             gridElementAtFromGridPos.MoveGridElementInDirection(direction);
         });
-
+    
         // The grid element that started this call is moved now
         gridElementAtGridPos.MoveGridElementInDirection(direction);
     }
@@ -265,41 +265,49 @@ public class LevelGrid : MonoBehaviour
             Debug.Log("Can't move GridElements");
             return;
         }
+        
+        Debug.Log("Can move GridElements");
 
         gridPositions.ForEach(gridPosition =>
         {
-            GridElement gridElementAtGridPos = GetGridElementAtGridPos(gridPosition);
-
-            gridElementAtGridPos.GetGridPositions()
-                .ForEach(_gridPosition =>
-                {
-                    MoveGridElement(_gridPosition, direction);
-                });
+            MoveGridElement(gridPosition, direction);
         });
     }
-    
-    /// <summary>
-    /// Get if ALL the GridElements at the given grid positions can be moved in the given direction
-    /// </summary>
-    /// <param name="gridPositions"> The grid positions to check </param>
-    /// <param name="direction"> The direction to check </param>
-    /// <returns> True if ALL the GridElements at the grid positions can be moved in the direction </returns>
+
     private bool CanMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
     {
-        return gridPositions
-                .All(gridPosition => GetGridElementAtGridPos(gridPosition).GetGridPositions()
-                    .All(_gridPosition => CanMoveGridElement(_gridPosition, direction)));
+        return gridPositions.All(gridPosition =>
+        {
+            GridPosition toGridPos = gridPosition + direction;
+
+            if (!ValidGridPosToMove(toGridPos))
+            {
+                Debug.Log("Can't move GridElements");
+                return false;
+            }
+
+            if (!GridPosHasAnyGridElement(toGridPos))
+            {
+                return true;
+            }
+
+            return CanMoveGridElements(GetGridElementAtGridPos(gridPosition + direction)
+                .GetGridPositions(), direction);
+        });
     }
 
-    private bool CanMoveGridElement(GridPosition fromGridPos, GridPosition direction)
+    private void PrintList(List<GridPosition> gridPositions)
     {
-        GridPosition toGridPos = fromGridPos + direction;
+        Debug.Log("----- Grid Positions ------");
         
-        return ValidGridPosToMove(toGridPos) && 
-               (!GridPosHasAnyGridElement(toGridPos) || 
-                CanMoveGridElement(toGridPos, direction));
+        gridPositions.ForEach(gridPosition =>
+        {
+            Debug.Log(gridPosition + " | ");
+        });
+        
+        Debug.Log("---------------------------");
     }
-
+    
     private bool ValidGridPosToMove(GridPosition gridPos)
     {
         return GridPosIsValid(gridPos) && GridPosIsWalkable(gridPos);

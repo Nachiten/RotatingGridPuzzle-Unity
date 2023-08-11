@@ -30,5 +30,7 @@ public class Player : GridElement
         
         // TDOO - Calculate grid positions for direction correctly
         LevelGrid.Instance.TryMoveGridElements(GetGridPositionsForDirection(direction), direction);
+        
+        //LevelGrid.Instance.MakeElementsToMoveList(GetGridPositionsForDirection(direction), direction);
     }
 }
