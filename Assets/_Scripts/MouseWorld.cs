@@ -19,18 +19,20 @@ public class MouseWorld : MonoBehaviour
         transform.position = GetPositionOnlyHitVisible();
     }
 
-    public static Vector3 GetPosition()
+    // private static Vector3 GetPosition()
+    // {
+    //     Ray ray = Instance.mainCamera.ScreenPointToRay(InputManager.Instance.GetMouseScreenPosition());
+    //     Physics.Raycast(ray, out RaycastHit raycastHit, float.MaxValue, Instance.mousePlaneLayerMask);
+    //
+    //     return raycastHit.point;
+    // }
+
+    private static Vector3 GetPositionOnlyHitVisible()
     {
         Ray ray = Instance.mainCamera.ScreenPointToRay(InputManager.Instance.GetMouseScreenPosition());
-        Physics.Raycast(ray, out RaycastHit raycastHit, float.MaxValue, Instance.mousePlaneLayerMask);
-
-        return raycastHit.point;
-    }
-
-    public static Vector3 GetPositionOnlyHitVisible()
-    {
-        Ray ray = Instance.mainCamera.ScreenPointToRay(InputManager.Instance.GetMouseScreenPosition());
-        RaycastHit[] raycastHits = Physics.RaycastAll(ray, float.MaxValue, Instance.mousePlaneLayerMask);
+        
+        RaycastHit[] raycastHits = new RaycastHit[5];
+        var size = Physics.RaycastNonAlloc(ray, raycastHits, float.MaxValue, Instance.mousePlaneLayerMask);
 
         System.Array.Sort(raycastHits, (x, y) => x.distance.CompareTo(y.distance));
 

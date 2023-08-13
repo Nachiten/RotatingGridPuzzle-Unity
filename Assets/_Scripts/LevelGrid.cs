@@ -52,8 +52,7 @@ public class LevelGrid : MonoBehaviour
             GridSystem<GridObject> gridSystem = new(width, height, cellSize, floor, FLOOR_HEIGHT,
                 (gridSystem, gridPosition) => new GridObject(gridSystem, gridPosition));
 
-            gridSystem.CreateDebugObjects(gridDebugObjectPrefab, gridDebugObjectParent);
-
+            //gridSystem.CreateDebugObjects(gridDebugObjectPrefab, gridDebugObjectParent);
             gridSystems.Add(gridSystem);
         }
     }
@@ -228,28 +227,34 @@ public class LevelGrid : MonoBehaviour
         {
             GridPosition _toGridPos = _fromGridPos + direction;
     
+            // Can NOT move to grid position, grid position invalid
             if (!ValidGridPosToMove(_toGridPos))
             {
                 Debug.LogError("Should not happen: Invalid grid position to move to");
                 return;
             }
-            
-            if (GridPosHasAnyGridElement(_toGridPos))
-                MoveGridElement(_toGridPos, direction);
-    
-            // Get the GridElement at the origin grid pos
-            GridElement gridElementAtFromGridPos = GetGridElementAtGridPos(_fromGridPos);
-    
-            // The grid element that started this call is moved after the loop finishes
-            if (gridElementAtFromGridPos == gridElementAtGridPos) 
+
+            // CAN move to grid position, grid position empty
+            if (!GridPosHasAnyGridElement(_toGridPos))
+            {
+                // Get the GridElement at the origin grid pos
+                GridElement gridElementAtFromGridPos = GetGridElementAtGridPos(_fromGridPos);
+
+                // The grid element that started this call is moved after the ones after it finish moving
+                if (gridElementAtFromGridPos == gridElementAtGridPos)
+                    return;
+
+                // Debug log from which to which grid pos I moved
+                // Debug.Log($"Moved {gridElementAtFromGridPos.name} " +
+                //           $"from [{_fromGridPos.ToString()}] " +
+                //           $"to [{_toGridPos.ToString()}]");
+
+                gridElementAtFromGridPos.MoveGridElementInDirection(direction);
                 return;
-            
-            // Debug log from which to which grid pos I moved
-            Debug.Log($"Moved {gridElementAtFromGridPos.name} " +
-                      $"from [{_fromGridPos.ToString()}] " +
-                      $"to [{_toGridPos.ToString()}]");
-                
-            gridElementAtFromGridPos.MoveGridElementInDirection(direction);
+            }
+           
+            // If base cases are not met, move the GridElement at toGridPos in the direction
+            MoveGridElement(_toGridPos, direction);
         });
     
         // The grid element that started this call is moved now
@@ -265,11 +270,11 @@ public class LevelGrid : MonoBehaviour
     {
         if (!CanMoveGridElements(gridPositions, direction))
         {
-            Debug.Log("Can't move GridElements");
+            //Debug.Log("Can't move GridElements");
             return false;
         }
         
-        Debug.Log("Can move GridElements");
+        //Debug.Log("Can move GridElements");
 
         gridPositions.ForEach(gridPosition =>
         {
@@ -279,6 +284,12 @@ public class LevelGrid : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Check if the GridElements at the given grid positions can be moved in the given direction
+    /// </summary>
+    /// <param name="gridPositions"></param>
+    /// <param name="direction"></param>
+    /// <returns></returns>
     private bool CanMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
     {
         return gridPositions.All(gridPosition =>
@@ -287,7 +298,7 @@ public class LevelGrid : MonoBehaviour
 
             if (!ValidGridPosToMove(toGridPos))
             {
-                Debug.Log("Can't move GridElements");
+                //Debug.Log("Can't move GridElements");
                 //PrintGridPositionsList(gridPositions, "Grid positions to move");
                 return false;
             }
@@ -295,22 +306,21 @@ public class LevelGrid : MonoBehaviour
             if (!GridPosHasAnyGridElement(toGridPos))
                 return true;
             
-            return CanMoveGridElements(
-                GetGridElementAtGridPos(gridPosition + direction).GetGridPositionsForDirection(direction), direction);
+            return CanMoveGridElements(GetGridElementAtGridPos(gridPosition + direction).GetGridPositionsForDirection(direction), direction);
         });
     }
 
-    public void PrintGridPositionsList(List<GridPosition> gridPositions, string listName = "Grid Positions")
-    {
-        Debug.Log($"----- {listName} ------");
-        
-        gridPositions.ForEach(gridPosition =>
-        {
-            Debug.Log(gridPosition + " | ");
-        });
-        
-        Debug.Log("---------------------------");
-    }
+    // public void PrintGridPositionsList(List<GridPosition> gridPositions, string listName = "Grid Positions")
+    // {
+    //     Debug.Log($"----- {listName} ------");
+    //     
+    //     gridPositions.ForEach(gridPosition =>
+    //     {
+    //         Debug.Log(gridPosition + " | ");
+    //     });
+    //     
+    //     Debug.Log("---------------------------");
+    // }
     
     private bool ValidGridPosToMove(GridPosition gridPos)
     {

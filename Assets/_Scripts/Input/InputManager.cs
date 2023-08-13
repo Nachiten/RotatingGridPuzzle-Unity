@@ -42,21 +42,38 @@ public class InputManager : MonoBehaviour
 #endif
     }
 
+    private Vector2 axisPreference = Vector2.zero;
+    private Vector2 prevMovingDirection = Vector2.zero;
+
     public Vector2 GetPlayerMovementVector()
     {
 #if USE_NEW_INPUT_SYSTEM
-        Vector2 inputMoveDir = Vector2.zero;
+        Vector2 inputMoveDir = playerInputActions.Player.PlayerMovement.ReadValue<Vector2>();
 
-        if (Keyboard.current[Key.W].wasPressedThisFrame)
-            inputMoveDir += Vector2.up;
-        else if (Keyboard.current[Key.A].wasPressedThisFrame)
-            inputMoveDir += Vector2.left;
-        else if (Keyboard.current[Key.S].wasPressedThisFrame)
-            inputMoveDir += Vector2.down;
-        else if (Keyboard.current[Key.D].wasPressedThisFrame)
-            inputMoveDir += Vector2.right;
+        // If one of the axis is 0, return value
+        if (inputMoveDir.x == 0f || inputMoveDir.y == 0f)
+        {
+            // Set prevMovingDirection and reset axisPreference
+            prevMovingDirection = inputMoveDir;
+            axisPreference = Vector2.zero;
+            return inputMoveDir;
+        }
 
+        // If there is axisPreference, return it
+        if (axisPreference != Vector2.zero)
+            return axisPreference;
+        
+        // There is no previous axisPreference
+        
+        // If it was moving on X, move on Y (set X to 0), and vice versa
+        if (prevMovingDirection.x != 0)
+            inputMoveDir.x = 0;
+        else
+            inputMoveDir.y = 0;
+
+        axisPreference = inputMoveDir;
         return inputMoveDir;
+        
 #else
         Vector2 inputMoveDir = Vector2.zero;
 
