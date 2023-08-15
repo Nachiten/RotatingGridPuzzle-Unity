@@ -7,7 +7,7 @@ public class LevelGrid : MonoBehaviour
 {
     public const float FLOOR_HEIGHT = 3f;
 
-    public event Action OnAnyGridElementMovedGridPosition;
+    public event Action<GridElement, GridPosition, GridPosition> OnAnyGridElementMovedGridPosition;
     public static event Action OnAnyGridElementChangedFloor;
 
     [SerializeField] private Transform gridDebugObjectPrefab;
@@ -122,7 +122,7 @@ public class LevelGrid : MonoBehaviour
         RemoveGridElementAtGridPos(fromGridPos, gridElement);
         AddGridElementAtGridPos(toGridPos, gridElement);
 
-        OnAnyGridElementMovedGridPosition?.Invoke();
+        OnAnyGridElementMovedGridPosition?.Invoke(gridElement, fromGridPos, toGridPos);
 
         // Only call this event if the GridElement changed floor
         if (fromGridPos.floor != toGridPos.floor)
