@@ -2,24 +2,11 @@ using UnityEngine;
 
 public class GridSystemVisual : MonoBehaviour
 {
-    public static GridSystemVisual Instance { get; private set; }
-
     [SerializeField] private Transform gridSystemVisualSinglePrefab;
     [SerializeField] private Transform gridSystemVisualSingleParent;
+    [SerializeField] private LayerMask objectivesLayerMask;
 
     private GridSystemVisualSingle[,,] gridSystemVisualSingleArray;
-    
-    private void Awake()
-    {
-        if (Instance != null)
-        {
-            Debug.LogError("More than one instance of GridSystemVisual found!");
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-    }
 
     private void Start()
     {
@@ -33,11 +20,25 @@ public class GridSystemVisual : MonoBehaviour
         for (int z = 0; z < height; z++)
         for (int floor = 0; floor < totalFloors; floor++)
         {
+            Vector3 worldPos = LevelGrid.Instance.GetWorldPos(new GridPosition(x, z, floor));
+            const float raycastOffsetDistance = 1f;
+            
+            // Check if there is already an objective on this grid position
+            bool objectivesRaycast = Physics.Raycast(
+                worldPos + Vector3.up * raycastOffsetDistance,
+                Vector3.down,
+                raycastOffsetDistance * 2,
+                objectivesLayerMask);
+
+            if (objectivesRaycast) 
+                continue;
+            
             Transform gridSystemVisual =
                 Instantiate(gridSystemVisualSinglePrefab, 
-                    LevelGrid.Instance.GetWorldPos(new GridPosition(x, z, floor)), 
-                    Quaternion.identity, gridSystemVisualSingleParent);
-
+                    worldPos, 
+                    Quaternion.identity, 
+                    gridSystemVisualSingleParent);
+                
             gridSystemVisualSingleArray[x, z, floor] = gridSystemVisual.GetComponent<GridSystemVisualSingle>();
         }
     }
