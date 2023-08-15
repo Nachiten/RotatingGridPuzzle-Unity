@@ -53,13 +53,10 @@ public struct GridPosition : IEquatable<GridPosition>
         return new GridPosition(a.x - b.x, a.z - b.z, a.floor - b.floor);
     }
 
-    // public int Distance(GridPosition other)
-    // {
-    //     return Math.Abs(x - other.x) + Math.Abs(z - other.z) + Math.Abs(floor - other.floor);
-    // }
-    
     public bool FloorIsValid(int totalFloors)
     {
         return floor >= 0 && floor < totalFloors;
     }
+    
+    public static GridPosition Zero => new GridPosition(0, 0, 0);
 }

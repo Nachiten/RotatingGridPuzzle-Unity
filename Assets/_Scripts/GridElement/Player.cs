@@ -2,11 +2,14 @@ using UnityEngine;
 
 public class Player : GridElement
 {
+    // Cooldown
     private float moveCooldownTimer;
     private const float moveCooldownMax = 0.2f;
     private bool isInCooldown;
-    private GridPosition moveDirection;
-    private Vector2 inputMoveDir;
+
+    // Movement
+    private GridPosition moveDirection = GridPosition.Zero;
+    private Vector2 inputMoveDir = Vector2.zero;
     
     protected override void Update()
     {
@@ -18,31 +21,70 @@ public class Player : GridElement
 
     private void HandlePlayerInput()
     {
-        // Move according to InputManager GetPlayerMovementVector vector
         inputMoveDir = InputManager.Instance.GetPlayerMovementVector();
     }
 
     private void HandlePlayerMovement()
     {
-        // If there is no input, reset cooldown
+        if (ShouldMove())
+            MovePlayer();
+    }
+
+    private bool ShouldMove()
+    {
+        // If there is no input, stop cooldown and dont move
         if (inputMoveDir == Vector2.zero)
         {
-            isInCooldown = false;
-            return;
+            StopCooldown();
+            return false;
         }
 
+        // If the player is not in cooldown, reset cooldown and move
         if (!isInCooldown)
         {
-            MovePlayer();
-            return;
+            ResetCooldown();
+            return true;
         }
-      
-        moveCooldownTimer -= Time.deltaTime;
-        if (moveCooldownTimer > 0f)
-            return;
 
+        // If move direction changed, reset cooldown and move
+        if (MoveDirectionChanged())
+        {
+            ResetCooldown();
+            return true;
+        }
+
+        moveCooldownTimer -= Time.deltaTime;
+        // If timer is not finsihed, dont move
+        if (moveCooldownTimer > 0f)
+            return false;
+        
+        // If timer is finished, reset cooldown and move
+        ResetCooldown();
+        return true;
+    }
+
+    private void StopCooldown()
+    {
         isInCooldown = false;
-        MovePlayer();
+    }
+
+    private void ResetCooldown()
+    {
+        isInCooldown = true;
+        moveCooldownTimer = moveCooldownMax;
+    }
+
+    private bool MoveDirectionChanged()
+    {
+        Vector3 moveDir = new(inputMoveDir.x * LevelGrid.Instance.GetCellSize(), 0f, inputMoveDir.y * LevelGrid.Instance.GetCellSize());
+        Vector3 newPosition = transform.position + moveDir;
+        
+        GridPosition newGridPosition = LevelGrid.Instance.GetGridPos(newPosition);
+        GridPosition newMoveDirection = newGridPosition - centerGridPosition;
+        
+        Debug.Log("New move direction: " + newMoveDirection);
+
+        return newMoveDirection != moveDirection && newMoveDirection != GridPosition.Zero;
     }
 
     private void MovePlayer()
@@ -60,8 +102,5 @@ public class Player : GridElement
         moveDirection = newGridPosition - centerGridPosition;
         
         LevelGrid.Instance.TryMoveGridElements(GetGridPositionsForDirection(moveDirection), moveDirection);
-        
-        isInCooldown = true;
-        moveCooldownTimer = moveCooldownMax;
     }
 }

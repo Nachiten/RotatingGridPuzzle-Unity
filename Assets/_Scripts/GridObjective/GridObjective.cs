@@ -12,8 +12,6 @@ public abstract class GridObjective : MonoBehaviour
     
     private void Start()
     {
-        GetComponent<GridObjectiveMaterial>().SetMaterial(GetObjectiveType());
-        
         gridPosition = LevelGrid.Instance.GetGridPos(transform.position);
         LevelGrid.Instance.OnAnyGridElementMovedGridPosition += OnAnyGridElementMovedGridPosition;
         
@@ -53,6 +51,4 @@ public abstract class GridObjective : MonoBehaviour
     }
     
     protected abstract bool IsCorrectGridElementType(GridElement gridElement);
-    
-    protected abstract ObjectiveType GetObjectiveType();
 }

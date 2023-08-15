@@ -45,8 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f813a2413ce7cb4a970fcba34bfb09e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectiveMaterialSO: {fileID: 11400000, guid: 36ccdd5f69c4e934783086e6a5a81493,
-    type: 2}
+  material: {fileID: 2100000, guid: 2296ff49a667815418c9a6f058a0b9e2, type: 2}
   quadMeshRenderer: {fileID: 696248977678543938}
 --- !u!1 &1645067384661433351
 GameObject:

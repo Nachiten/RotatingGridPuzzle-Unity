@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class GridObjectiveMaterial : MonoBehaviour
 {
-    [SerializeField] private ObjectiveMaterialSO objectiveMaterialSO;
+    [SerializeField] private Material material;
     [SerializeField] private MeshRenderer quadMeshRenderer;
-
-    public void SetMaterial(ObjectiveType objectiveType)
+    
+    private void Awake()
     {
-        quadMeshRenderer.material = objectiveMaterialSO.GetMaterialByObjectiveType(objectiveType);
+        quadMeshRenderer.material = material;
     }
 }
