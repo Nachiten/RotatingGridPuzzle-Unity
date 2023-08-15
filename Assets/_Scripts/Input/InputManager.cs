@@ -1,5 +1,6 @@
 #define USE_NEW_INPUT_SYSTEM
 
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -24,23 +25,32 @@ public class InputManager : MonoBehaviour
         playerInputActions.Player.Enable();
     }
 
-    public Vector2 GetMouseScreenPosition()
+    public bool IsRestartButtonDownThisFrame()
     {
 #if USE_NEW_INPUT_SYSTEM
-        return Mouse.current.position.ReadValue();
+        return playerInputActions.Player.Restart.WasPerformedThisFrame();
 #else
-        return Input.mousePosition;
+        return Input.GetKeyDown(KeyCode.R);
 #endif
     }
 
-    public bool IsMouseButtonDownThisFrame()
-    {
-#if USE_NEW_INPUT_SYSTEM
-        return playerInputActions.Player.Click.WasPerformedThisFrame();
-#else
-       return Input.GetMouseButtonDown(0);
-#endif
-    }
+//     public Vector2 GetMouseScreenPosition()
+//     {
+// #if USE_NEW_INPUT_SYSTEM
+//         return Mouse.current.position.ReadValue();
+// #else
+//         return Input.mousePosition;
+// #endif
+//     }
+
+//     public bool IsMouseButtonDownThisFrame()
+//     {
+// #if USE_NEW_INPUT_SYSTEM
+//         return playerInputActions.Player.Click.WasPerformedThisFrame();
+// #else
+//        return Input.GetMouseButtonDown(0);
+// #endif
+//     }
 
     private Vector2 axisPreference = Vector2.zero;
     private Vector2 prevMovingDirection = Vector2.zero;
@@ -92,38 +102,4 @@ public class InputManager : MonoBehaviour
         return inputMoveDir;
 #endif
     }
-
-//     public float GetCameraRotateAmount()
-//     {
-// #if USE_NEW_INPUT_SYSTEM
-//         return playerInputActions.Player.CameraRotate.ReadValue<float>();
-// #else
-//         float rotateAmount = 0f;
-//
-//         if (Input.GetKey(KeyCode.Q))
-//             rotateAmount += 1f;
-//
-//         if (Input.GetKey(KeyCode.E))
-//             rotateAmount -= 1f;
-//
-//         return rotateAmount;
-// #endif
-//     }
-
-//     public float GetCameraZoomAmount()
-//     {
-// #if USE_NEW_INPUT_SYSTEM
-//         return playerInputActions.Player.CameraZoom.ReadValue<float>();
-// #else
-//         float zoomAmount = 0f;
-//         
-//         if (Input.mouseScrollDelta.y > 0)
-//             zoomAmount -= 1f;
-//
-//         if (Input.mouseScrollDelta.y < 0)
-//             zoomAmount += 1f;
-//
-//         return zoomAmount;
-// #endif
-//     }
 }
