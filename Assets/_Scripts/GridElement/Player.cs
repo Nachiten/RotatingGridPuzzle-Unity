@@ -101,6 +101,6 @@ public class Player : GridElement
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPos(newPosition);
         moveDirection = newGridPosition - centerGridPosition;
         
-        LevelGrid.Instance.TryMoveGridElements(GetGridPositionsForDirection(moveDirection), moveDirection);
+        GridElementMovement.Instance.TryMoveGridElements(GetGridPositionsForDirection(moveDirection), moveDirection);
     }
 }
