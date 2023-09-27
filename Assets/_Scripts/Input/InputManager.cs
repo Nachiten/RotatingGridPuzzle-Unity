@@ -31,6 +31,42 @@ public class InputManager : MonoBehaviour
 #endif
     }
 
+    public bool IsUndoButtonPressed()
+    {
+#if USE_NEW_INPUT_SYSTEM
+        return playerInputActions.Player.Undo.IsPressed();
+#else
+        return Input.GetKeyDown(KeyCode.Z);
+#endif
+    }
+
+    public bool IsRedoButtonPressed()
+    {
+#if USE_NEW_INPUT_SYSTEM
+        return playerInputActions.Player.Redo.IsPressed();
+#else 
+     return Input.GetKeyDown(KeyCode.X);
+#endif
+    }
+    
+    public bool WasUndoButtonPressedThisFrame()
+    {
+#if USE_NEW_INPUT_SYSTEM
+        return playerInputActions.Player.Undo.WasPerformedThisFrame();
+#else
+        return Input.GetKeyDown(KeyCode.Z);
+#endif
+    }
+
+    public bool WasRedoButtonPressedThisFrame()
+    {
+#if USE_NEW_INPUT_SYSTEM
+        return playerInputActions.Player.Redo.WasPerformedThisFrame();
+#else 
+     return Input.GetKeyDown(KeyCode.X);
+#endif
+    }
+    
 //     public Vector2 GetMouseScreenPosition()
 //     {
 // #if USE_NEW_INPUT_SYSTEM

@@ -5,73 +5,10 @@ using UnityEngine;
 public class GridElementMovement : MonoBehaviour
 {
     public static GridElementMovement Instance { get; private set; }
-
-    private List<MovementHistory> movementHistories;
-    private int historyIndex = -1;
     
     private void Awake()
     {
         Instance = this;
-        movementHistories = new List<MovementHistory>();
-    }
-    
-    // Make update, detect the KeyDown of R
-    // If R is pressed, call the function to undo the last movement
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Z))
-            UndoMovement();
-        else if (Input.GetKeyDown(KeyCode.X))
-            RedoMovement();
-    }
-
-    private void RedoMovement()
-    {
-        // If there is no history to redo
-        if (historyIndex == movementHistories.Count - 1)
-        {
-            Debug.Log("Nothing to redo");
-            return;
-        }
-        
-        MovementHistory nextHistory = movementHistories[++historyIndex];
-        
-        // Move the grid elements forward in time
-        nextHistory.gridElements.ForEach(gridElement =>
-        {
-            gridElement.MoveGridElementInDirection(nextHistory.direction);
-        });
-    }
-
-    private void AddHistory(List<GridElement> gridElements, GridPosition direction)
-    {
-        // If the history index is not at the end of the list, remove all elements after it
-        if (historyIndex != movementHistories.Count - 1)
-            movementHistories.RemoveRange(historyIndex + 1, movementHistories.Count - historyIndex - 1);
-        
-        movementHistories.Add(new MovementHistory(gridElements, direction));
-        historyIndex++;
-    }
-
-    private void UndoMovement()
-    {
-        // If there is no history to undo
-        if (historyIndex == -1)
-        {
-            Debug.Log("Nothing to undo");
-            return;
-        }
-        
-        MovementHistory prevHistory = movementHistories[historyIndex--];
-        
-        // Invert the movement direction
-        GridPosition invertedDirection = prevHistory.direction * new GridPosition(-1, -1, 0);
-        
-        // Move the grid elements back in time
-        prevHistory.gridElements.ForEach(gridElement =>
-        {
-            gridElement.MoveGridElementInDirection(invertedDirection);
-        });
     }
 
     /// <summary>
@@ -96,8 +33,6 @@ public class GridElementMovement : MonoBehaviour
         // Cycle through all grid positions at target pos
         gridPositionsToMoveTo.ForEach(_fromGridPos =>
         {
-            //gridElementsMoved.Add(LevelGrid.Instance.GetGridElementAtGridPos(_fromGridPos));
-            
             // Calculate toGridPos for this _fromGridPos
             GridPosition _toGridPos = _fromGridPos + direction;
     
@@ -147,7 +82,7 @@ public class GridElementMovement : MonoBehaviour
             gridElementsMoved.AddRange(MoveGridElement(gridPosition, direction));
         });
         
-        AddHistory(gridElementsMoved, direction);
+        HistoryManager.Instance.AddHistory(gridElementsMoved, direction);
     }
 
     /// <summary>
@@ -175,7 +110,7 @@ public class GridElementMovement : MonoBehaviour
         });
     }
 
-    // public void PrintGridPositionsList(List<GridPosition> gridPositions, string listName = "Grid Positions")
+    // private void PrintGridPositionsList(List<GridPosition> gridPositions, string listName = "Grid Positions")
     // {
     //     Debug.Log($"----- {listName} ------");
     //     
@@ -187,15 +122,15 @@ public class GridElementMovement : MonoBehaviour
     //     Debug.Log("---------------------------");
     // }
     
-    public void PrintGridElementsList(List<GridElement> gridElements, string listName = "Grid Elements")
-    {
-        Debug.Log($"----- {listName} ------");
-        
-        gridElements.ForEach(gridElement =>
-        {
-            Debug.Log(gridElement + " | ");
-        });
-        
-        Debug.Log("---------------------------");
-    }
+    // private void PrintGridElementsList(List<GridElement> gridElements, string listName = "Grid Elements")
+    // {
+    //     Debug.Log($"----- {listName} ------");
+    //     
+    //     gridElements.ForEach(gridElement =>
+    //     {
+    //         Debug.Log(gridElement + " | ");
+    //     });
+    //     
+    //     Debug.Log("---------------------------");
+    // }
 }
