@@ -18,19 +18,23 @@ public class GridElementMovement : MonoBehaviour
     /// <param name="direction"> The direction to move the GridElement in </param>
     private void MoveGridElement(GridPosition fromGridPos, GridPosition direction)
     {
+        // Get the grid element at the origin grid pos
         GridElement gridElementAtGridPos = LevelGrid.Instance.GetGridElementAtGridPos(fromGridPos);
+        // Get the grid positions occupied by the grid element at target pos
         List<GridPosition> gridPositionsToMoveTo = gridElementAtGridPos.GetGridPositionsForDirection(direction);
         
         //PrintGridPositionsList(gridPositionsToMoveTo, "Grid positions to move to");
         
-        // Cycle through all grid positions in the given direction
+        // Cycle through all grid positions at target pos
         gridPositionsToMoveTo.ForEach(_fromGridPos =>
         {
+            // Calculate toGridPos for this _fromGridPos
             GridPosition _toGridPos = _fromGridPos + direction;
     
-            // Can NOT move to grid position, grid position invalid
+            // Can NOT move to grid position, target grid pos invalid
             if (!LevelGrid.Instance.ValidGridPosToMove(_toGridPos))
             {
+                // This should not happen, because we scan if it is possible before executing
                 Debug.LogError("Should not happen: Invalid grid position to move to");
                 return;
             }
@@ -50,11 +54,12 @@ public class GridElementMovement : MonoBehaviour
                 //           $"from [{_fromGridPos.ToString()}] " +
                 //           $"to [{_toGridPos.ToString()}]");
 
+                // Move the grid element at the origin grid pos to the target grid pos
                 gridElementAtFromGridPos.MoveGridElementInDirection(direction);
                 return;
             }
            
-            // If base cases are not met, move the GridElement at toGridPos in the direction
+            // If base cases are not met, continue the problem forward recursively until reaching a base case (can move, or reach a barrier)
             MoveGridElement(_toGridPos, direction);
         });
     
