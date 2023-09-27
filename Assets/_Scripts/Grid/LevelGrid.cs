@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class LevelGrid : MonoBehaviour
@@ -10,8 +9,8 @@ public class LevelGrid : MonoBehaviour
     public event Action<GridElement, GridPosition, GridPosition> OnAnyGridElementMovedGridPosition;
     public static event Action OnAnyGridElementChangedFloor;
 
-    [SerializeField] private Transform gridDebugObjectPrefab;
-    [SerializeField] private Transform gridDebugObjectParent;
+    // [SerializeField] private Transform gridDebugObjectPrefab;
+    // [SerializeField] private Transform gridDebugObjectParent;
 
     [SerializeField] private int width;
     [SerializeField] private int height;

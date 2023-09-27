@@ -1,10 +1,10 @@
 using System;
 
-public struct GridPosition : IEquatable<GridPosition>
+public readonly struct GridPosition : IEquatable<GridPosition>
 {
-    public int x;
-    public int z;
-    public int floor;
+    public readonly int x;
+    public readonly int z;
+    public readonly int floor;
 
     public GridPosition(int x, int z, int floor)
     {

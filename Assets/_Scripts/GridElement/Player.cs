@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : GridElement
@@ -26,11 +27,11 @@ public class Player : GridElement
 
     private void HandlePlayerMovement()
     {
-        if (ShouldMove())
-            MovePlayer();
+        if (ShouldTryToMove())
+            TryMovePlayer();
     }
 
-    private bool ShouldMove()
+    private bool ShouldTryToMove()
     {
         // If there is no input, stop cooldown and dont move
         if (inputMoveDir == Vector2.zero)
@@ -54,7 +55,7 @@ public class Player : GridElement
         }
 
         moveCooldownTimer -= Time.deltaTime;
-        // If timer is not finsihed, dont move
+        // If timer is not finished, dont move
         if (moveCooldownTimer > 0f)
             return false;
         
@@ -76,31 +77,50 @@ public class Player : GridElement
 
     private bool MoveDirectionChanged()
     {
-        Vector3 moveDir = new(inputMoveDir.x * LevelGrid.Instance.GetCellSize(), 0f, inputMoveDir.y * LevelGrid.Instance.GetCellSize());
-        Vector3 newPosition = transform.position + moveDir;
+        GridPosition newMoveDirection = GetMoveDirectionGridPositionForOriginPos(transform.position);
         
-        GridPosition newGridPosition = LevelGrid.Instance.GetGridPos(newPosition);
-        GridPosition newMoveDirection = newGridPosition - centerGridPosition;
-        
-        Debug.Log("New move direction: " + newMoveDirection);
-
+        // Get if there is new move direction, and if it changed
         return newMoveDirection != moveDirection && newMoveDirection != GridPosition.Zero;
     }
 
-    private void MovePlayer()
+    private void TryMovePlayer()
     {
-        // If the player was already moving, teleport it to the previous target position
+        CalculateNewMoveDirection();
+        
+        List<GridPosition> gridPositionsForDirection = GetGridPositionsForDirection(moveDirection);
+        
+        // Get if player can indeed move and push blocks if needed
+        bool canMove = GridElementMovement.Instance.CanMoveGridElements(gridPositionsForDirection, moveDirection);
+
+        if (!canMove) 
+            return;
+        
+        // If the player was already moving, teleport it to the previous target position before starting the new movement
         if (isMoving)
             transform.position = targetPosition;
+            
+        // We MUST have checked that it can move before calling this, if not explosion
+        GridElementMovement.Instance.MoveGridElements(gridPositionsForDirection, moveDirection);
+    }
 
-        // Calculate new position
-        Vector3 moveDir = new(inputMoveDir.x * LevelGrid.Instance.GetCellSize(), 0f, inputMoveDir.y * LevelGrid.Instance.GetCellSize());
-        Vector3 newPosition = transform.position + moveDir;
+    private void CalculateNewMoveDirection()
+    {
+        // If we are moving, the origin position is the target position (as if we already finished moving), otherwise it is the current position
+        Vector3 originPosition = isMoving ? targetPosition : transform.position;
         
-        // Calculate new grid position and direction
+        moveDirection = GetMoveDirectionGridPositionForOriginPos(originPosition);
+    }
+
+    private GridPosition GetMoveDirectionGridPositionForOriginPos(Vector3 originPosition)
+    {
+        Vector3 newPosition = originPosition + CalculateMoveDirVector();
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPos(newPosition);
-        moveDirection = newGridPosition - centerGridPosition;
-        
-        GridElementMovement.Instance.TryMoveGridElements(GetGridPositionsForDirection(moveDirection), moveDirection);
+
+        return newGridPosition - centerGridPosition;
+    }
+
+    private Vector3 CalculateMoveDirVector()
+    {
+        return new Vector3(inputMoveDir.x * LevelGrid.Instance.GetCellSize(), 0f, inputMoveDir.y * LevelGrid.Instance.GetCellSize());
     }
 }

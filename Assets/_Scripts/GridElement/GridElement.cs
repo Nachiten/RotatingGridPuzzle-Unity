@@ -43,27 +43,11 @@ public class GridElement : MonoBehaviour
     {
         MoveGridPositionsInDirection(direction);
     }
-
+    
     private void MoveGridPositionsInDirection(GridPosition direction)
     {
-        // Order the gridPositions depending on direction
-        // If direction.x > 0, then order by x DESCENDING (-gridPosition.x)
-        // So that when you move, the GridPositions to the side where we are moving to, are moved first
-        gridPositions = gridPositions.OrderBy(gridPosition =>
-        {
-            return direction.x switch
-            {
-                > 0 => -gridPosition.x,
-                < 0 => +gridPosition.x,
-                _ => direction.z switch
-                {
-                    > 0 => -gridPosition.z,
-                    < 0 => +gridPosition.z,
-                    _ => 0
-                }
-            };
-        }).ToList();
-        
+        OrderGridPositionsForDirection(direction);
+
         gridPositions = gridPositions.Select(gridPosition =>
         {
             GridPosition toGridPos = gridPosition + direction;
@@ -81,7 +65,28 @@ public class GridElement : MonoBehaviour
             return gridPosition + direction;
         }).ToList();
     }
-    
+
+    private void OrderGridPositionsForDirection(GridPosition direction)
+    {
+        // Order the gridPositions depending on direction
+        // If direction.x > 0, then order by x DESCENDING (-gridPosition.x)
+        // So that when you move, the GridPositions to the side where we are moving to are moved first
+        gridPositions = gridPositions.OrderBy(gridPosition =>
+        {
+            return direction.x switch
+            {
+                > 0 => -gridPosition.x,
+                < 0 => +gridPosition.x,
+                _ => direction.z switch
+                {
+                    > 0 => -gridPosition.z,
+                    < 0 => +gridPosition.z,
+                    _ => 0
+                }
+            };
+        }).ToList();
+    }
+
     public virtual List<GridPosition> GetGridPositionsForDirection(GridPosition direction)
     {
         return gridPositions;

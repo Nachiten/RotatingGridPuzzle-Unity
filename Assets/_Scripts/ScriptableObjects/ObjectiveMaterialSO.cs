@@ -12,15 +12,15 @@ public struct ObjectiveMaterial
 [CreateAssetMenu(menuName = "ScriptableObjects/ObjectiveMaterialSO")]
 public class ObjectiveMaterialSO : ScriptableObject
 {
-    public ObjectiveMaterial[] objectiveMaterials;
+    // public ObjectiveMaterial[] objectiveMaterials;
     
-    public Material GetMaterialByObjectiveType(ObjectiveType objectiveType)
-    {
-        return (
-            from objectiveMaterial in objectiveMaterials 
-            where objectiveMaterial.objectiveType == objectiveType 
-            select objectiveMaterial.material)
-            .FirstOrDefault();
-    }
+    // public Material GetMaterialByObjectiveType(ObjectiveType objectiveType)
+    // {
+    //     return (
+    //         from objectiveMaterial in objectiveMaterials 
+    //         where objectiveMaterial.objectiveType == objectiveType 
+    //         select objectiveMaterial.material)
+    //         .FirstOrDefault();
+    // }
 }
 

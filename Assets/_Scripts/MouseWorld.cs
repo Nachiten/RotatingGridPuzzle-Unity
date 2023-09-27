@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class MouseWorld : MonoBehaviour
 {
+    // THIS CODE WILL BE USED IN THE FUTURE TO ROTATE THE GRID
+    
     // private static MouseWorld Instance;
     //
     // [SerializeField] private LayerMask mousePlaneLayerMask;

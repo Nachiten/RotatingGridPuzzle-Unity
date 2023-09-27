@@ -33,27 +33,27 @@ public class Box : GridElement
 
     public override List<GridPosition> GetGridPositionsForDirection(GridPosition direction)
     {
-        int _xOffet = direction.x switch
+        int _xOffset = direction.x switch
         {
             > 0 => xOffset,
             < 0 => -xOffset,
             _ => 0
         };
 
-        int _zOffet = direction.z switch
+        int _zOffset = direction.z switch
         {
             > 0 => zOffset,
             < 0 => -zOffset,
             _ => 0
         };
-
-        // La coord x de la grid pos tiene q ser = a la coord x del centro de la box + el offset
-        // Idem la coord z
+        
+        // X coord of grid pos has to be equal to the x coord of the center of the box + the offset+
+        // Same with the z coord
         List<GridPosition> _gridPositions = gridPositions.Where(gridPosition =>
         {
             // Its is not moving in that direction, or it is moving in that and the grid pos obeys the condition
-            bool hasXOffset = _xOffet == 0 || gridPosition.x == centerGridPosition.x + _xOffet;
-            bool hasZOffset = _zOffet == 0 || gridPosition.z == centerGridPosition.z + _zOffet;
+            bool hasXOffset = _xOffset == 0 || gridPosition.x == centerGridPosition.x + _xOffset;
+            bool hasZOffset = _zOffset == 0 || gridPosition.z == centerGridPosition.z + _zOffset;
             
             return hasXOffset && hasZOffset;
         }).ToList();

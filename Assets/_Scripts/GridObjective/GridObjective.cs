@@ -41,7 +41,7 @@ public abstract class GridObjective : MonoBehaviour
                 if (!IsCorrectGridElementType(gridElement))
                     return;
 
-                // Uncomplete it
+                // Un-complete it
                 isCompleted = false;
                 OnAnyGridObjectiveUncompleted?.Invoke(gridPosition);
 

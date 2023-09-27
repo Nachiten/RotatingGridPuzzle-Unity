@@ -62,27 +62,12 @@ public class GridElementMovement : MonoBehaviour
         gridElementAtGridPos.MoveGridElementInDirection(direction);
     }
 
-    /// <summary>
-    /// Try to move the GridElements at the given grid positions in the given direction
-    /// </summary>
-    /// <param name="gridPositions"> The grid positions to move the GridElements from </param>
-    /// <param name="direction"> The direction to move the GridElements in </param>
-    public bool TryMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
+    public void MoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
     {
-        if (!CanMoveGridElements(gridPositions, direction))
-        {
-            //Debug.Log("Can't move GridElements");
-            return false;
-        }
-        
-        //Debug.Log("Can move GridElements");
-
         gridPositions.ForEach(gridPosition =>
         {
             MoveGridElement(gridPosition, direction);
         });
-
-        return true;
     }
 
     /// <summary>
@@ -91,7 +76,7 @@ public class GridElementMovement : MonoBehaviour
     /// <param name="gridPositions"></param>
     /// <param name="direction"></param>
     /// <returns></returns>
-    private bool CanMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
+    public bool CanMoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
     {
         return gridPositions.All(gridPosition =>
         {
@@ -104,10 +89,9 @@ public class GridElementMovement : MonoBehaviour
                 return false;
             }
 
-            if (!LevelGrid.Instance.GridPosHasAnyGridElement(toGridPos))
-                return true;
-            
-            return CanMoveGridElements(LevelGrid.Instance.GetGridElementAtGridPos(gridPosition + direction).GetGridPositionsForDirection(direction), direction);
+            return !LevelGrid.Instance.GridPosHasAnyGridElement(toGridPos) || 
+                   CanMoveGridElements(LevelGrid.Instance.GetGridElementAtGridPos(gridPosition + direction)
+                       .GetGridPositionsForDirection(direction), direction);
         });
     }
 
