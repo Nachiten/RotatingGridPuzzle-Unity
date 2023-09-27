@@ -6,20 +6,88 @@ public class GridElementMovement : MonoBehaviour
 {
     public static GridElementMovement Instance { get; private set; }
 
+    private List<MovementHistory> movementHistories;
+    private int historyIndex = -1;
+    
     private void Awake()
     {
         Instance = this;
+        movementHistories = new List<MovementHistory>();
     }
     
+    // Make update, detect the KeyDown of R
+    // If R is pressed, call the function to undo the last movement
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Z))
+            UndoMovement();
+        else if (Input.GetKeyDown(KeyCode.X))
+            RedoMovement();
+    }
+
+    private void RedoMovement()
+    {
+        // If there is no history to redo
+        if (historyIndex == movementHistories.Count - 1)
+        {
+            Debug.Log("Nothing to redo");
+            return;
+        }
+        
+        MovementHistory nextHistory = movementHistories[++historyIndex];
+        
+        // Move the grid elements forward in time
+        nextHistory.gridElements.ForEach(gridElement =>
+        {
+            gridElement.MoveGridElementInDirection(nextHistory.direction);
+        });
+    }
+
+    private void AddHistory(List<GridElement> gridElements, GridPosition direction)
+    {
+        // If the history index is not at the end of the list, remove all elements after it
+        if (historyIndex != movementHistories.Count - 1)
+            movementHistories.RemoveRange(historyIndex + 1, movementHistories.Count - historyIndex - 1);
+        
+        movementHistories.Add(new MovementHistory(gridElements, direction));
+        historyIndex++;
+    }
+
+    private void UndoMovement()
+    {
+        // If there is no history to undo
+        if (historyIndex == -1)
+        {
+            Debug.Log("Nothing to undo");
+            return;
+        }
+        
+        MovementHistory prevHistory = movementHistories[historyIndex--];
+        
+        // Invert the movement direction
+        GridPosition invertedDirection = prevHistory.direction * new GridPosition(-1, -1, 0);
+        
+        // Move the grid elements back in time
+        prevHistory.gridElements.ForEach(gridElement =>
+        {
+            gridElement.MoveGridElementInDirection(invertedDirection);
+        });
+    }
+
     /// <summary>
     /// Move a GridElement from the given grid position in the given direction
     /// </summary>
     /// <param name="fromGridPos"> The origin grid position </param>
     /// <param name="direction"> The direction to move the GridElement in </param>
-    private void MoveGridElement(GridPosition fromGridPos, GridPosition direction)
+    private List<GridElement> MoveGridElement(GridPosition fromGridPos, GridPosition direction)
     {
+        List<GridElement> gridElementsMoved = new();
+
         // Get the grid element at the origin grid pos
         GridElement gridElementAtGridPos = LevelGrid.Instance.GetGridElementAtGridPos(fromGridPos);
+        
+        gridElementsMoved.Add(gridElementAtGridPos);
+        
         // Get the grid positions occupied by the grid element at target pos
         List<GridPosition> gridPositionsToMoveTo = gridElementAtGridPos.GetGridPositionsForDirection(direction);
         
@@ -28,6 +96,8 @@ public class GridElementMovement : MonoBehaviour
         // Cycle through all grid positions at target pos
         gridPositionsToMoveTo.ForEach(_fromGridPos =>
         {
+            //gridElementsMoved.Add(LevelGrid.Instance.GetGridElementAtGridPos(_fromGridPos));
+            
             // Calculate toGridPos for this _fromGridPos
             GridPosition _toGridPos = _fromGridPos + direction;
     
@@ -60,19 +130,24 @@ public class GridElementMovement : MonoBehaviour
             }
            
             // If base cases are not met, continue the problem forward recursively until reaching a base case (can move, or reach a barrier)
-            MoveGridElement(_toGridPos, direction);
+            gridElementsMoved.AddRange(MoveGridElement(_toGridPos, direction));
         });
     
         // The grid element that started this call is moved now
         gridElementAtGridPos.MoveGridElementInDirection(direction);
+        return gridElementsMoved;
     }
 
     public void MoveGridElements(List<GridPosition> gridPositions, GridPosition direction)
     {
+        List<GridElement> gridElementsMoved = new();
+        
         gridPositions.ForEach(gridPosition =>
         {
-            MoveGridElement(gridPosition, direction);
+            gridElementsMoved.AddRange(MoveGridElement(gridPosition, direction));
         });
+        
+        AddHistory(gridElementsMoved, direction);
     }
 
     /// <summary>
@@ -111,4 +186,16 @@ public class GridElementMovement : MonoBehaviour
     //     
     //     Debug.Log("---------------------------");
     // }
+    
+    public void PrintGridElementsList(List<GridElement> gridElements, string listName = "Grid Elements")
+    {
+        Debug.Log($"----- {listName} ------");
+        
+        gridElements.ForEach(gridElement =>
+        {
+            Debug.Log(gridElement + " | ");
+        });
+        
+        Debug.Log("---------------------------");
+    }
 }

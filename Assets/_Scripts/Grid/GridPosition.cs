@@ -1,5 +1,6 @@
 using System;
 
+[Serializable]
 public readonly struct GridPosition : IEquatable<GridPosition>
 {
     public readonly int x;
@@ -59,4 +60,9 @@ public readonly struct GridPosition : IEquatable<GridPosition>
     }
     
     public static GridPosition Zero => new GridPosition(0, 0, 0);
+    
+    public static GridPosition operator *(GridPosition a, GridPosition b)
+    {
+        return new GridPosition(a.x * b.x, a.z * b.z, a.floor * b.floor);
+    }
 }

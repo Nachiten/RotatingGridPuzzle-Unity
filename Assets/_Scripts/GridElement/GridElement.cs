@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -99,4 +100,27 @@ public class GridElement : MonoBehaviour
 
     // public GridPosition GetCenterGridPosition() => centerGridPosition;
     // public Vector3 GetWorldPosition() => transform.position;
+
+    protected bool Equals(GridElement other)
+    {
+        return base.Equals(other) && centerGridPosition.Equals(other.centerGridPosition);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != this.GetType()) return false;
+        return Equals((GridElement)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(base.GetHashCode(), centerGridPosition);
+    }
+    
+    public override string ToString()
+    {
+        return $"GridElement: {centerGridPosition}";
+    }
 }
