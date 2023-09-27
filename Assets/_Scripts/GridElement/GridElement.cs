@@ -47,7 +47,12 @@ public class GridElement : MonoBehaviour
     private void MoveGridPositionsInDirection(GridPosition direction)
     {
         OrderGridPositionsForDirection(direction);
+        ExecuteGridPositionsMovement(direction);
+    }
 
+    private void ExecuteGridPositionsMovement(GridPosition direction)
+    {
+        // Update all grid positions and move the center grid position
         gridPositions = gridPositions.Select(gridPosition =>
         {
             GridPosition toGridPos = gridPosition + direction;

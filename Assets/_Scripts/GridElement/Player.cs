@@ -98,7 +98,7 @@ public class Player : GridElement
         // If the player was already moving, teleport it to the previous target position before starting the new movement
         if (isMoving)
             transform.position = targetPosition;
-            
+        
         // We MUST have checked that it can move before calling this, if not explosion
         GridElementMovement.Instance.MoveGridElements(gridPositionsForDirection, moveDirection);
     }
